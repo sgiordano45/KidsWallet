@@ -908,14 +908,8 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAavO4IE21FEwBeY7fuFdBFYc9dflpLk90",
-      authDomain: "kidswallet-406a6.firebaseapp.com",
-      projectId: "kidswallet-406a6",
-      storageBucket: "kidswallet-406a6.firebasestorage.app",
-      messagingSenderId: "367658453381",
-      appId: "1:367658453381:web:790006549937f9f7fc5cec"
-    };
+    // Firebase config imported from external file
+    import { firebaseConfig } from './firebase-config.js';
 
     // Check if Firebase is configured
     const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
