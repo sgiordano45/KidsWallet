@@ -482,6 +482,18 @@
       background: var(--bg-card-hover);
     }
 
+    .action-btn.allowance {
+      background: linear-gradient(135deg, var(--accent-gold), #f0b429);
+      color: var(--bg-primary);
+      box-shadow: 0 4px 20px rgba(255, 217, 61, 0.3);
+      flex: 1.2;
+    }
+
+    .action-btn.allowance:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(255, 217, 61, 0.4);
+    }
+
     /* Modal */
     .modal-overlay {
       position: fixed;
@@ -778,7 +790,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
             </svg>
-            Upcoming
+            Next Interest
           </span>
           <span class="interest-rate" id="interestRateDisplay">5% monthly</span>
         </div>
@@ -786,8 +798,8 @@
           <div class="interest-progress-bar" id="interestProgressBar" style="width: 0%"></div>
         </div>
         <div class="interest-info">
-          <span id="daysUntilInterest">Set allowance in settings</span>
-          <span id="nextInterestAmount">+$0.00 interest on 1st</span>
+          <span id="daysUntilInterest">Loading...</span>
+          <span id="nextInterestAmount">+$0.00 on 1st</span>
         </div>
       </div>
 
@@ -814,11 +826,17 @@
         </svg>
         Spend
       </button>
+      <button class="action-btn allowance" onclick="claimAllowance()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        I Earned It!
+      </button>
       <button class="action-btn primary" onclick="openModal('deposit')">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 5v14M5 12h14"/>
         </svg>
-        Add Money
+        Add
       </button>
     </div>
   </div>
@@ -852,21 +870,11 @@
       <div class="settings-item">
         <div>
           <p class="settings-label">Allowance Amount</p>
-          <p class="settings-sublabel">Amount added every 2 weeks</p>
+          <p class="settings-sublabel">Amount earned for completing chores</p>
         </div>
         <div class="settings-value">
           <span>$</span>
           <input type="number" class="settings-input" id="allowanceAmountInput" value="5" min="0" max="1000" step="0.50">
-        </div>
-      </div>
-      
-      <div class="settings-item">
-        <div>
-          <p class="settings-label">Next Allowance Date</p>
-          <p class="settings-sublabel">When the next $5 will be added</p>
-        </div>
-        <div class="settings-value">
-          <input type="date" class="settings-input" id="nextAllowanceDateInput" style="width: auto;">
         </div>
       </div>
       
@@ -883,8 +891,18 @@
       
       <div class="settings-item">
         <div>
+          <p class="settings-label">Parent PIN</p>
+          <p class="settings-sublabel">Required to reset or change settings</p>
+        </div>
+        <div class="settings-value">
+          <input type="password" class="settings-input" id="parentPinInput" placeholder="••••" maxlength="6" style="width: 80px; text-align: center;">
+        </div>
+      </div>
+      
+      <div class="settings-item">
+        <div>
           <p class="settings-label">Reset Everything</p>
-          <p class="settings-sublabel">Clear all data and start fresh</p>
+          <p class="settings-sublabel">Clear all data (requires PIN)</p>
         </div>
         <button class="danger-btn" onclick="confirmReset()">Reset</button>
       </div>
@@ -892,6 +910,22 @@
       <div class="modal-actions">
         <button class="modal-btn cancel" onclick="closeSettings()">Close</button>
         <button class="modal-btn confirm" onclick="saveSettings()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN Entry Modal -->
+  <div class="modal-overlay" id="pinModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title">Enter Parent PIN</h2>
+      <div class="form-group">
+        <label class="form-label">PIN</label>
+        <input type="password" class="form-input amount" id="pinInput" placeholder="••••" maxlength="6" inputmode="numeric" style="font-size: 24px; letter-spacing: 8px;">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn cancel" onclick="closePinModal()">Cancel</button>
+        <button class="modal-btn confirm" id="pinConfirmBtn" onclick="verifyPin()">Confirm</button>
       </div>
     </div>
   </div>
@@ -951,9 +985,8 @@
       settings: {
         interestRate: 5,              // Monthly interest rate
         lastInterestMonth: null,      // Track last month interest was paid (e.g., "2024-02")
-        allowanceAmount: 5,           // Bi-weekly allowance amount
-        nextAllowanceDate: null,      // Next date to add allowance (ISO string)
-        lastAllowanceDate: null       // Track when allowance was last added
+        allowanceAmount: 5,           // Allowance amount when earned
+        parentPin: null               // PIN required for reset and settings changes
       }
     };
 
@@ -1019,7 +1052,6 @@
       }
       
       checkInterest();
-      checkAllowance();
       updateUI();
     }
 
@@ -1132,44 +1164,75 @@
       }
     }
 
-    // Check and apply bi-weekly allowance
-    async function checkAllowance() {
-      if (!state.settings.nextAllowanceDate) return;
-      
+    // Claim allowance - manual trigger when kid earns it
+    async function claimAllowance() {
+      const allowanceAmount = state.settings.allowanceAmount || 5;
       const now = new Date();
-      const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
-      const nextDate = state.settings.nextAllowanceDate.split('T')[0];
       
-      if (today >= nextDate) {
-        const allowanceAmount = state.settings.allowanceAmount || 5;
-        
-        state.balance += allowanceAmount;
-        state.totalDeposits += allowanceAmount;
-        
-        const transaction = {
-          type: 'deposit',
-          amount: allowanceAmount,
-          description: 'Bi-weekly Allowance',
-          date: now.toISOString()
-        };
-        
-        // Calculate next allowance date (14 days from now)
-        const nextAllowance = new Date(now);
-        nextAllowance.setDate(nextAllowance.getDate() + 14);
-        state.settings.nextAllowanceDate = nextAllowance.toISOString();
-        state.settings.lastAllowanceDate = now.toISOString();
-        
-        // Save transaction to Firestore
-        await saveTransaction(transaction);
-        
-        // Add to local state for immediate UI update
-        state.transactions.unshift({ id: Date.now().toString(), ...transaction });
-        
-        await saveWallet();
-        showToast(`Allowance added: +$${allowanceAmount.toFixed(2)}! 💰`, 'success');
-        createConfetti();
-      }
+      state.balance += allowanceAmount;
+      state.totalDeposits += allowanceAmount;
+      
+      const transaction = {
+        type: 'deposit',
+        amount: allowanceAmount,
+        description: 'Allowance Earned! ⭐',
+        date: now.toISOString()
+      };
+      
+      // Save transaction to Firestore
+      await saveTransaction(transaction);
+      
+      // Add to local state for immediate UI update
+      state.transactions.unshift({ id: Date.now().toString(), ...transaction });
+      
+      await saveWallet();
+      showToast(`Great job! You earned $${allowanceAmount.toFixed(2)}! 🌟`, 'success');
+      createConfetti();
+      updateUI();
     }
+    
+    // Make claimAllowance available globally
+    window.claimAllowance = claimAllowance;
+
+    // PIN verification
+    let pendingPinAction = null;
+
+    window.openPinModal = function(action) {
+      pendingPinAction = action;
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinModal').classList.add('active');
+      setTimeout(() => {
+        document.getElementById('pinInput').focus();
+      }, 300);
+    };
+
+    window.closePinModal = function() {
+      document.getElementById('pinModal').classList.remove('active');
+      pendingPinAction = null;
+    };
+
+    window.verifyPin = function() {
+      const enteredPin = document.getElementById('pinInput').value;
+      const correctPin = state.settings.parentPin;
+      
+      if (!correctPin) {
+        showToast('No PIN set. Set one in settings first!', 'error');
+        closePinModal();
+        return;
+      }
+      
+      if (enteredPin === correctPin) {
+        closePinModal();
+        if (pendingPinAction === 'reset') {
+          executeReset();
+        } else if (pendingPinAction === 'settings') {
+          document.getElementById('settingsModal').classList.add('active');
+        }
+      } else {
+        showToast('Incorrect PIN', 'error');
+        document.getElementById('pinInput').value = '';
+      }
+    };
 
     // UI Update Functions
     function updateUI() {
@@ -1216,24 +1279,12 @@
       document.getElementById('interestRateDisplay').textContent = `${state.settings.interestRate}% monthly`;
       document.getElementById('nextInterestAmount').textContent = `+$${nextInterest.toFixed(2)} on 1st`;
       
-      // Calculate days until next allowance
-      let allowanceText = '';
-      if (state.settings.nextAllowanceDate) {
-        const nextAllowance = new Date(state.settings.nextAllowanceDate);
-        const daysUntilAllowance = Math.ceil((nextAllowance - now) / (1000 * 60 * 60 * 24));
-        
-        if (daysUntilAllowance <= 0) {
-          allowanceText = 'Allowance due today!';
-        } else if (daysUntilAllowance === 1) {
-          allowanceText = '1 day until allowance';
-        } else {
-          allowanceText = `${daysUntilAllowance} days until allowance`;
-        }
-      } else {
-        allowanceText = 'Set allowance date in settings';
-      }
+      // Show days until interest
+      const interestText = daysUntilInterest === 1 
+        ? '1 day until interest' 
+        : `${daysUntilInterest} days until interest`;
       
-      document.getElementById('daysUntilInterest').textContent = allowanceText;
+      document.getElementById('daysUntilInterest').textContent = interestText;
     }
 
     function updateTransactions() {
@@ -1370,22 +1421,21 @@
 
     // Settings Functions
     window.openSettings = function() {
+      // If PIN is set, require it to access settings
+      if (state.settings.parentPin) {
+        openPinModal('settings');
+      } else {
+        showSettingsModal();
+      }
+    };
+    
+    function showSettingsModal() {
       document.getElementById('interestRateInput').value = state.settings.interestRate || 5;
       document.getElementById('allowanceAmountInput').value = state.settings.allowanceAmount || 5;
-      
-      // Set next allowance date input
-      const nextAllowanceInput = document.getElementById('nextAllowanceDateInput');
-      if (state.settings.nextAllowanceDate) {
-        nextAllowanceInput.value = state.settings.nextAllowanceDate.split('T')[0];
-      } else {
-        // Default to 14 days from now
-        const defaultDate = new Date();
-        defaultDate.setDate(defaultDate.getDate() + 14);
-        nextAllowanceInput.value = defaultDate.toISOString().split('T')[0];
-      }
+      document.getElementById('parentPinInput').value = state.settings.parentPin || '';
       
       document.getElementById('settingsModal').classList.add('active');
-    };
+    }
 
     window.closeSettings = function() {
       document.getElementById('settingsModal').classList.remove('active');
@@ -1395,9 +1445,10 @@
       state.settings.interestRate = parseFloat(document.getElementById('interestRateInput').value) || 5;
       state.settings.allowanceAmount = parseFloat(document.getElementById('allowanceAmountInput').value) || 5;
       
-      const nextAllowanceDateValue = document.getElementById('nextAllowanceDateInput').value;
-      if (nextAllowanceDateValue) {
-        state.settings.nextAllowanceDate = new Date(nextAllowanceDateValue).toISOString();
+      // Save parent PIN
+      const newPin = document.getElementById('parentPinInput').value.trim();
+      if (newPin) {
+        state.settings.parentPin = newPin;
       }
       
       await saveWallet();
@@ -1406,8 +1457,20 @@
       showToast('Settings saved!', 'success');
     };
 
-    window.confirmReset = async function() {
+    window.confirmReset = function() {
+      // Always require PIN for reset
+      if (state.settings.parentPin) {
+        openPinModal('reset');
+      } else {
+        showToast('Set a Parent PIN first to enable reset', 'error');
+      }
+    };
+    
+    async function executeReset() {
       if (confirm('Are you sure you want to reset everything? This cannot be undone!')) {
+        // Preserve the PIN
+        const savedPin = state.settings.parentPin;
+        
         // Reset state
         state = {
           balance: 0,
@@ -1419,8 +1482,7 @@
             interestRate: 5,
             lastInterestMonth: null,
             allowanceAmount: 5,
-            nextAllowanceDate: null,
-            lastAllowanceDate: null
+            parentPin: savedPin  // Keep the PIN
           }
         };
         
@@ -1434,7 +1496,7 @@
         closeSettings();
         showToast('Everything has been reset', 'success');
       }
-    };
+    }
 
     // Toast
     function showToast(message, type = 'success') {
