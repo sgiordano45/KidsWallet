@@ -778,16 +778,16 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
             </svg>
-            Next Interest
+            Upcoming
           </span>
-          <span class="interest-rate" id="interestRateDisplay">5% weekly</span>
+          <span class="interest-rate" id="interestRateDisplay">5% monthly</span>
         </div>
         <div class="interest-progress">
           <div class="interest-progress-bar" id="interestProgressBar" style="width: 0%"></div>
         </div>
         <div class="interest-info">
-          <span id="daysUntilInterest">7 days until payday</span>
-          <span id="nextInterestAmount">+$0.00</span>
+          <span id="daysUntilInterest">Set allowance in settings</span>
+          <span id="nextInterestAmount">+$0.00 interest on 1st</span>
         </div>
       </div>
 
@@ -851,30 +851,33 @@
       
       <div class="settings-item">
         <div>
-          <p class="settings-label">Interest Rate</p>
-          <p class="settings-sublabel">Percentage earned each week</p>
+          <p class="settings-label">Allowance Amount</p>
+          <p class="settings-sublabel">Amount added every 2 weeks</p>
         </div>
         <div class="settings-value">
-          <input type="number" class="settings-input" id="interestRateInput" value="5" min="0" max="100" step="0.5">
-          <span>%</span>
+          <span>$</span>
+          <input type="number" class="settings-input" id="allowanceAmountInput" value="5" min="0" max="1000" step="0.50">
         </div>
       </div>
       
       <div class="settings-item">
         <div>
-          <p class="settings-label">Interest Day</p>
-          <p class="settings-sublabel">Day of the week to add interest</p>
+          <p class="settings-label">Next Allowance Date</p>
+          <p class="settings-sublabel">When the next $5 will be added</p>
         </div>
         <div class="settings-value">
-          <select class="settings-input" id="interestDayInput" style="width: auto;">
-            <option value="0">Sunday</option>
-            <option value="1">Monday</option>
-            <option value="2">Tuesday</option>
-            <option value="3">Wednesday</option>
-            <option value="4">Thursday</option>
-            <option value="5">Friday</option>
-            <option value="6" selected>Saturday</option>
-          </select>
+          <input type="date" class="settings-input" id="nextAllowanceDateInput" style="width: auto;">
+        </div>
+      </div>
+      
+      <div class="settings-item">
+        <div>
+          <p class="settings-label">Monthly Interest Rate</p>
+          <p class="settings-sublabel">Compounds on the 1st of each month</p>
+        </div>
+        <div class="settings-value">
+          <input type="number" class="settings-input" id="interestRateInput" value="5" min="0" max="100" step="0.5">
+          <span>%</span>
         </div>
       </div>
       
@@ -946,9 +949,11 @@
       totalDeposits: 0,
       transactions: [],
       settings: {
-        interestRate: 5,
-        interestDay: 6, // Saturday
-        lastInterestDate: null
+        interestRate: 5,              // Monthly interest rate
+        lastInterestMonth: null,      // Track last month interest was paid (e.g., "2024-02")
+        allowanceAmount: 5,           // Bi-weekly allowance amount
+        nextAllowanceDate: null,      // Next date to add allowance (ISO string)
+        lastAllowanceDate: null       // Track when allowance was last added
       }
     };
 
@@ -1014,6 +1019,7 @@
       }
       
       checkInterest();
+      checkAllowance();
       updateUI();
     }
 
@@ -1087,14 +1093,15 @@
       }
     }
 
-    // Check and apply interest
+    // Check and apply monthly interest (compounds on the 1st of each month)
     async function checkInterest() {
       const now = new Date();
-      const today = now.getDay();
-      const todayStr = now.toDateString();
+      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const dayOfMonth = now.getDate();
       
-      if (today === state.settings.interestDay && 
-          state.settings.lastInterestDate !== todayStr &&
+      // Only apply interest on the 1st of the month, and only once per month
+      if (dayOfMonth === 1 && 
+          state.settings.lastInterestMonth !== currentMonth &&
           state.balance > 0) {
         
         const interestAmount = state.balance * (state.settings.interestRate / 100);
@@ -1103,12 +1110,12 @@
         if (roundedInterest > 0) {
           state.balance += roundedInterest;
           state.totalInterest += roundedInterest;
-          state.settings.lastInterestDate = todayStr;
+          state.settings.lastInterestMonth = currentMonth;
           
           const transaction = {
             type: 'interest',
             amount: roundedInterest,
-            description: `Weekly Interest (${state.settings.interestRate}%)`,
+            description: `Monthly Interest (${state.settings.interestRate}%)`,
             date: now.toISOString()
           };
           
@@ -1122,6 +1129,45 @@
           showToast(`Interest added: +$${roundedInterest.toFixed(2)}! 🎉`, 'success');
           createConfetti();
         }
+      }
+    }
+
+    // Check and apply bi-weekly allowance
+    async function checkAllowance() {
+      if (!state.settings.nextAllowanceDate) return;
+      
+      const now = new Date();
+      const today = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      const nextDate = state.settings.nextAllowanceDate.split('T')[0];
+      
+      if (today >= nextDate) {
+        const allowanceAmount = state.settings.allowanceAmount || 5;
+        
+        state.balance += allowanceAmount;
+        state.totalDeposits += allowanceAmount;
+        
+        const transaction = {
+          type: 'deposit',
+          amount: allowanceAmount,
+          description: 'Bi-weekly Allowance',
+          date: now.toISOString()
+        };
+        
+        // Calculate next allowance date (14 days from now)
+        const nextAllowance = new Date(now);
+        nextAllowance.setDate(nextAllowance.getDate() + 14);
+        state.settings.nextAllowanceDate = nextAllowance.toISOString();
+        state.settings.lastAllowanceDate = now.toISOString();
+        
+        // Save transaction to Firestore
+        await saveTransaction(transaction);
+        
+        // Add to local state for immediate UI update
+        state.transactions.unshift({ id: Date.now().toString(), ...transaction });
+        
+        await saveWallet();
+        showToast(`Allowance added: +$${allowanceAmount.toFixed(2)}! 💰`, 'success');
+        createConfetti();
       }
     }
 
@@ -1156,23 +1202,38 @@
 
     function updateInterestProgress() {
       const now = new Date();
-      const currentDay = now.getDay();
-      const targetDay = state.settings.interestDay;
       
-      let daysUntil = targetDay - currentDay;
-      if (daysUntil <= 0) daysUntil += 7;
-      if (daysUntil === 7 && state.settings.lastInterestDate === now.toDateString()) {
-        daysUntil = 7;
-      }
+      // Calculate days until 1st of next month (interest day)
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const daysUntilInterest = Math.ceil((nextMonth - now) / (1000 * 60 * 60 * 24));
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysPassed = now.getDate();
       
-      const progress = ((7 - daysUntil) / 7) * 100;
+      const interestProgress = (daysPassed / daysInMonth) * 100;
       const nextInterest = state.balance * (state.settings.interestRate / 100);
       
-      document.getElementById('interestProgressBar').style.width = `${progress}%`;
-      document.getElementById('daysUntilInterest').textContent = 
-        daysUntil === 1 ? '1 day until payday' : `${daysUntil} days until payday`;
-      document.getElementById('nextInterestAmount').textContent = `+$${nextInterest.toFixed(2)}`;
-      document.getElementById('interestRateDisplay').textContent = `${state.settings.interestRate}% weekly`;
+      document.getElementById('interestProgressBar').style.width = `${interestProgress}%`;
+      document.getElementById('interestRateDisplay').textContent = `${state.settings.interestRate}% monthly`;
+      document.getElementById('nextInterestAmount').textContent = `+$${nextInterest.toFixed(2)} on 1st`;
+      
+      // Calculate days until next allowance
+      let allowanceText = '';
+      if (state.settings.nextAllowanceDate) {
+        const nextAllowance = new Date(state.settings.nextAllowanceDate);
+        const daysUntilAllowance = Math.ceil((nextAllowance - now) / (1000 * 60 * 60 * 24));
+        
+        if (daysUntilAllowance <= 0) {
+          allowanceText = 'Allowance due today!';
+        } else if (daysUntilAllowance === 1) {
+          allowanceText = '1 day until allowance';
+        } else {
+          allowanceText = `${daysUntilAllowance} days until allowance`;
+        }
+      } else {
+        allowanceText = 'Set allowance date in settings';
+      }
+      
+      document.getElementById('daysUntilInterest').textContent = allowanceText;
     }
 
     function updateTransactions() {
@@ -1309,8 +1370,20 @@
 
     // Settings Functions
     window.openSettings = function() {
-      document.getElementById('interestRateInput').value = state.settings.interestRate;
-      document.getElementById('interestDayInput').value = state.settings.interestDay;
+      document.getElementById('interestRateInput').value = state.settings.interestRate || 5;
+      document.getElementById('allowanceAmountInput').value = state.settings.allowanceAmount || 5;
+      
+      // Set next allowance date input
+      const nextAllowanceInput = document.getElementById('nextAllowanceDateInput');
+      if (state.settings.nextAllowanceDate) {
+        nextAllowanceInput.value = state.settings.nextAllowanceDate.split('T')[0];
+      } else {
+        // Default to 14 days from now
+        const defaultDate = new Date();
+        defaultDate.setDate(defaultDate.getDate() + 14);
+        nextAllowanceInput.value = defaultDate.toISOString().split('T')[0];
+      }
+      
       document.getElementById('settingsModal').classList.add('active');
     };
 
@@ -1320,7 +1393,13 @@
 
     window.saveSettings = async function() {
       state.settings.interestRate = parseFloat(document.getElementById('interestRateInput').value) || 5;
-      state.settings.interestDay = parseInt(document.getElementById('interestDayInput').value);
+      state.settings.allowanceAmount = parseFloat(document.getElementById('allowanceAmountInput').value) || 5;
+      
+      const nextAllowanceDateValue = document.getElementById('nextAllowanceDateInput').value;
+      if (nextAllowanceDateValue) {
+        state.settings.nextAllowanceDate = new Date(nextAllowanceDateValue).toISOString();
+      }
+      
       await saveWallet();
       updateUI();
       closeSettings();
@@ -1338,8 +1417,10 @@
           transactions: [],
           settings: {
             interestRate: 5,
-            interestDay: 6,
-            lastInterestDate: null
+            lastInterestMonth: null,
+            allowanceAmount: 5,
+            nextAllowanceDate: null,
+            lastAllowanceDate: null
           }
         };
         
