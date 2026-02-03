@@ -1222,11 +1222,14 @@
       }
       
       if (enteredPin === correctPin) {
+        // Save action before closing (closePinModal resets pendingPinAction)
+        const action = pendingPinAction;
         closePinModal();
-        if (pendingPinAction === 'reset') {
+        
+        if (action === 'reset') {
           executeReset();
-        } else if (pendingPinAction === 'settings') {
-          document.getElementById('settingsModal').classList.add('active');
+        } else if (action === 'settings') {
+          showSettingsModal();
         }
       } else {
         showToast('Incorrect PIN', 'error');
