@@ -1,10 +1,11 @@
-const CACHE_NAME = 'my-wallet-v1';
+const CACHE_NAME = 'my-wallet-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  './',
+  './index.html',
+  './manifest.json',
+  './icon-192.png',
+  './icon-512.png',
+  './firebase-config.js',
   'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@700&display=swap'
 ];
 
@@ -75,7 +76,7 @@ self.addEventListener('fetch', (event) => {
           return response;
         }).catch(() => {
           // Return offline page or fallback if available
-          return caches.match('/index.html');
+          return caches.match('./index.html');
         });
       })
   );
