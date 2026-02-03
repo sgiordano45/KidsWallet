@@ -897,16 +897,24 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    // Firebase Configuration - Replace with your config!
-    // To set up Firebase:
-    // 1. Go to https://console.firebase.google.com/
-    // 2. Create a new project
-    // 3. Add a web app to get your config
-    // 4. Enable Firestore Database
-    // 5. Replace the config below with your values
-    
+    // Firebase imports
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc, 
+      onSnapshot,
+      collection,
+      addDoc,
+      query,
+      orderBy,
+      limit,
+      getDocs,
+      deleteDoc,
+      writeBatch,
+      serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     // Firebase config imported from external file
     import { firebaseConfig } from './firebase-config.js';
@@ -915,7 +923,8 @@
     const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
     
     let db = null;
-    let unsubscribe = null;
+    let unsubscribeWallet = null;
+    let unsubscribeTransactions = null;
 
     if (isFirebaseConfigured) {
       try {
@@ -934,6 +943,7 @@
       balance: 0,
       totalInterest: 0,
       totalSpent: 0,
+      totalDeposits: 0,
       transactions: [],
       settings: {
         interestRate: 5,
@@ -942,36 +952,59 @@
       }
     };
 
-    // Device ID for multi-device sync
-    const getDeviceId = () => {
-      let id = localStorage.getItem('deviceId');
-      if (!id) {
-        id = 'wallet_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('deviceId', id);
-      }
-      return id;
-    };
+    // Wallet ID - you can change this to support multiple kids
+    const WALLET_ID = 'main_wallet';
 
-    const deviceId = getDeviceId();
-
-    // Load/Save State
+    // Load/Save State with proper Firestore collections
     async function loadState() {
-      // Try Firebase first
       if (db) {
         try {
-          const docRef = doc(db, 'wallets', deviceId);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            state = { ...state, ...docSnap.data() };
-          }
+          // Load wallet data
+          const walletRef = doc(db, 'wallets', WALLET_ID);
+          const walletSnap = await getDoc(walletRef);
           
-          // Set up real-time listener
-          unsubscribe = onSnapshot(docRef, (doc) => {
+          if (walletSnap.exists()) {
+            const walletData = walletSnap.data();
+            state.balance = walletData.balance || 0;
+            state.totalInterest = walletData.totalInterest || 0;
+            state.totalSpent = walletData.totalSpent || 0;
+            state.totalDeposits = walletData.totalDeposits || 0;
+            state.settings = walletData.settings || state.settings;
+          }
+
+          // Load transactions from subcollection
+          const transactionsRef = collection(db, 'wallets', WALLET_ID, 'transactions');
+          const transactionsQuery = query(transactionsRef, orderBy('date', 'desc'), limit(50));
+          const transactionsSnap = await getDocs(transactionsQuery);
+          
+          state.transactions = [];
+          transactionsSnap.forEach(doc => {
+            state.transactions.push({ id: doc.id, ...doc.data() });
+          });
+
+          // Set up real-time listener for wallet
+          unsubscribeWallet = onSnapshot(walletRef, (doc) => {
             if (doc.exists()) {
-              state = { ...state, ...doc.data() };
+              const walletData = doc.data();
+              state.balance = walletData.balance || 0;
+              state.totalInterest = walletData.totalInterest || 0;
+              state.totalSpent = walletData.totalSpent || 0;
+              state.totalDeposits = walletData.totalDeposits || 0;
+              state.settings = walletData.settings || state.settings;
               updateUI();
             }
           });
+
+          // Set up real-time listener for transactions
+          unsubscribeTransactions = onSnapshot(transactionsQuery, (snapshot) => {
+            state.transactions = [];
+            snapshot.forEach(doc => {
+              state.transactions.push({ id: doc.id, ...doc.data() });
+            });
+            updateTransactions();
+          });
+
+          console.log('Loaded from Firestore');
         } catch (e) {
           console.log('Firebase load failed, using localStorage', e);
           loadFromLocalStorage();
@@ -991,22 +1024,71 @@
       }
     }
 
-    async function saveState() {
+    // Save wallet summary to Firestore
+    async function saveWallet() {
       // Save to localStorage always (offline support)
       localStorage.setItem('walletState', JSON.stringify(state));
       
-      // Save to Firebase if available
       if (db) {
         try {
-          await setDoc(doc(db, 'wallets', deviceId), state);
+          const walletRef = doc(db, 'wallets', WALLET_ID);
+          await setDoc(walletRef, {
+            balance: state.balance,
+            totalInterest: state.totalInterest,
+            totalSpent: state.totalSpent,
+            totalDeposits: state.totalDeposits,
+            settings: state.settings,
+            lastUpdated: serverTimestamp()
+          }, { merge: true });
+          console.log('Wallet saved to Firestore');
         } catch (e) {
-          console.log('Firebase save failed', e);
+          console.log('Firebase wallet save failed', e);
+        }
+      }
+    }
+
+    // Save a transaction to Firestore subcollection
+    async function saveTransaction(transaction) {
+      if (db) {
+        try {
+          const transactionsRef = collection(db, 'wallets', WALLET_ID, 'transactions');
+          const docRef = await addDoc(transactionsRef, {
+            type: transaction.type,
+            amount: transaction.amount,
+            description: transaction.description,
+            date: transaction.date,
+            createdAt: serverTimestamp()
+          });
+          console.log('Transaction saved with ID:', docRef.id);
+          return docRef.id;
+        } catch (e) {
+          console.log('Firebase transaction save failed', e);
+        }
+      }
+      return null;
+    }
+
+    // Delete all transactions (for reset)
+    async function deleteAllTransactions() {
+      if (db) {
+        try {
+          const transactionsRef = collection(db, 'wallets', WALLET_ID, 'transactions');
+          const snapshot = await getDocs(transactionsRef);
+          
+          const batch = writeBatch(db);
+          snapshot.forEach(doc => {
+            batch.delete(doc.ref);
+          });
+          await batch.commit();
+          console.log('All transactions deleted');
+        } catch (e) {
+          console.log('Failed to delete transactions', e);
         }
       }
     }
 
     // Check and apply interest
-    function checkInterest() {
+    async function checkInterest() {
       const now = new Date();
       const today = now.getDay();
       const todayStr = now.toDateString();
@@ -1023,15 +1105,20 @@
           state.totalInterest += roundedInterest;
           state.settings.lastInterestDate = todayStr;
           
-          state.transactions.unshift({
-            id: Date.now(),
+          const transaction = {
             type: 'interest',
             amount: roundedInterest,
             description: `Weekly Interest (${state.settings.interestRate}%)`,
             date: now.toISOString()
-          });
+          };
           
-          saveState();
+          // Save transaction to Firestore
+          await saveTransaction(transaction);
+          
+          // Add to local state for immediate UI update
+          state.transactions.unshift({ id: Date.now().toString(), ...transaction });
+          
+          await saveWallet();
           showToast(`Interest added: +$${roundedInterest.toFixed(2)}! 🎉`, 'success');
           createConfetti();
         }
@@ -1075,7 +1162,7 @@
       let daysUntil = targetDay - currentDay;
       if (daysUntil <= 0) daysUntil += 7;
       if (daysUntil === 7 && state.settings.lastInterestDate === now.toDateString()) {
-        daysUntil = 7; // Just got paid today
+        daysUntil = 7;
       }
       
       const progress = ((7 - daysUntil) / 7) * 100;
@@ -1126,7 +1213,7 @@
         const amountPrefix = tx.type === 'withdrawal' ? '-' : '+';
         
         return `
-          <div class="transaction">
+          <div class="transaction" data-id="${tx.id}">
             <div class="transaction-icon ${iconClass}">${icon}</div>
             <div class="transaction-details">
               <p class="transaction-title">${tx.description}</p>
@@ -1173,7 +1260,7 @@
       document.getElementById('transactionModal').classList.remove('active');
     };
 
-    window.confirmTransaction = function() {
+    window.confirmTransaction = async function() {
       const amount = parseFloat(document.getElementById('amountInput').value);
       const description = document.getElementById('descriptionInput').value.trim() || 
         (currentModalType === 'deposit' ? 'Deposit' : 'Purchase');
@@ -1189,15 +1276,16 @@
       }
       
       const transaction = {
-        id: Date.now(),
         type: currentModalType,
         amount: Math.round(amount * 100) / 100,
         description: description,
         date: new Date().toISOString()
       };
       
+      // Update balance
       if (currentModalType === 'deposit') {
         state.balance += transaction.amount;
+        state.totalDeposits += transaction.amount;
         showToast(`Added $${transaction.amount.toFixed(2)}!`, 'success');
         createConfetti();
       } else {
@@ -1206,8 +1294,15 @@
         showToast(`Spent $${transaction.amount.toFixed(2)}`, 'success');
       }
       
-      state.transactions.unshift(transaction);
-      saveState();
+      // Save transaction to Firestore
+      const txId = await saveTransaction(transaction);
+      
+      // Add to local state for immediate UI update
+      state.transactions.unshift({ id: txId || Date.now().toString(), ...transaction });
+      
+      // Save wallet summary
+      await saveWallet();
+      
       updateUI();
       closeModal();
     };
@@ -1223,21 +1318,23 @@
       document.getElementById('settingsModal').classList.remove('active');
     };
 
-    window.saveSettings = function() {
+    window.saveSettings = async function() {
       state.settings.interestRate = parseFloat(document.getElementById('interestRateInput').value) || 5;
       state.settings.interestDay = parseInt(document.getElementById('interestDayInput').value);
-      saveState();
+      await saveWallet();
       updateUI();
       closeSettings();
       showToast('Settings saved!', 'success');
     };
 
-    window.confirmReset = function() {
+    window.confirmReset = async function() {
       if (confirm('Are you sure you want to reset everything? This cannot be undone!')) {
+        // Reset state
         state = {
           balance: 0,
           totalInterest: 0,
           totalSpent: 0,
+          totalDeposits: 0,
           transactions: [],
           settings: {
             interestRate: 5,
@@ -1245,7 +1342,13 @@
             lastInterestDate: null
           }
         };
-        saveState();
+        
+        // Delete all transactions from Firestore
+        await deleteAllTransactions();
+        
+        // Save reset wallet
+        await saveWallet();
+        
         updateUI();
         closeSettings();
         showToast('Everything has been reset', 'success');
