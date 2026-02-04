@@ -109,15 +109,29 @@
     .action-btn-earned {
       width: 100%;
       margin-bottom: var(--space-xl);
-      background: var(--card-gold);
-      border: 2px solid var(--accent-gold);
-      color: var(--accent-gold);
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      border: 3px solid #b45309;
+      color: #1a1a2e;
+      box-shadow: 
+        0 4px 20px rgba(251, 191, 36, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+      font-weight: 800;
     }
     
     .action-btn-earned:hover {
-      background: rgba(245, 158, 11, 0.2);
-      box-shadow: var(--shadow-glow-gold);
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 
+        0 8px 30px rgba(251, 191, 36, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      border-color: #92400e;
+    }
+    
+    .action-btn-earned:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 
+        0 2px 10px rgba(251, 191, 36, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     .action-btn {
