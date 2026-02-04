@@ -901,6 +901,8 @@
       </div>
     </div>
     
+    </div> <!-- end walletContent -->
+    
     <!-- Wallet Management (always visible) -->
     <div class="admin-section">
       <div class="admin-section-header">
@@ -919,17 +921,15 @@
           <!-- Wallets loaded dynamically -->
         </div>
         
-        <button class="btn btn-secondary btn-full mt-md" onclick="openAddChildModal()">
+        <button class="btn btn-secondary btn-full mt-md" onclick="openAddChildModal()" id="addChildBtn">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="10"/>
             <path d="M12 8v8M8 12h8"/>
           </svg>
-          Add Another Child
+          <span id="addChildBtnText">Add Child</span>
         </button>
       </div>
     </div>
-    
-    </div> <!-- end walletContent -->
   </div>
   
   <!-- Edit Transaction Modal -->
@@ -1103,20 +1103,33 @@
       // Load all wallets first
       await loadWallets();
       
+      if (allWallets.length === 0) {
+        // No wallets exist yet - hide selector and show welcome state
+        walletSelector.style.display = 'none';
+        walletContent.style.display = 'none';
+        noWalletState.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">👋</div>
+            <p class="empty-state-title">Welcome to KidsWallet!</p>
+            <p class="empty-state-text">Add your first child below to get started</p>
+          </div>
+        `;
+        noWalletState.style.display = 'block';
+        mainApp.style.display = 'block';
+        document.getElementById('heroSubtitle').textContent = 'Set up your family\'s wallets';
+        return;
+      }
+      
       if (isParentMode) {
         // Parent mode - show wallet selector prominently
         document.getElementById('heroSubtitle').textContent = 'Manage your family\'s wallets';
         walletSelector.style.display = 'block';
         
-        // If there are wallets, auto-select the first one
-        if (allWallets.length > 0) {
-          viewingWalletId = allWallets[0].id;
-          walletSelect.value = viewingWalletId;
-          setSelectedWalletId(viewingWalletId); // Temporarily set for data loading
-          subscribeToCurrentWallet();
-        } else {
-          showNoWalletState();
-        }
+        // Auto-select the first wallet
+        viewingWalletId = allWallets[0].id;
+        walletSelect.value = viewingWalletId;
+        setSelectedWalletId(viewingWalletId); // Temporarily set for data loading
+        subscribeToCurrentWallet();
       } else {
         // Device mode - use the device's wallet
         viewingWalletId = deviceWalletId;
@@ -1214,11 +1227,21 @@
     function renderWallets() {
       const list = document.getElementById('walletsList');
       const deviceWalletId = getSelectedWalletId();
+      const btnText = document.getElementById('addChildBtnText');
       
       if (allWallets.length === 0) {
-        list.innerHTML = '<p class="text-muted text-center">No wallets yet. Add a child to get started!</p>';
+        list.innerHTML = `
+          <div class="empty-state" style="padding: var(--space-lg) 0;">
+            <div class="empty-state-icon">👶</div>
+            <p class="empty-state-title">No wallets yet</p>
+            <p class="empty-state-text">Add your first child to get started!</p>
+          </div>
+        `;
+        if (btnText) btnText.textContent = 'Add Your First Child';
         return;
       }
+      
+      if (btnText) btnText.textContent = 'Add Another Child';
       
       list.innerHTML = allWallets.map(w => {
         const isDeviceWallet = w.id === deviceWalletId && !isParentMode;
@@ -1262,11 +1285,20 @@
       if (walletId) {
         closeAddChildModal();
         showToast(`${name}'s wallet created!`, 'success');
+        
+        const wasEmpty = allWallets.length === 0;
         await loadWallets();
+        
+        // Show wallet selector now that we have wallets
+        walletSelector.style.display = 'block';
+        noWalletState.style.display = 'none';
         
         // Auto-switch to the new wallet
         switchWallet(walletId);
         walletSelect.value = walletId;
+        
+        // Update hero
+        document.getElementById('heroSubtitle').innerHTML = `Managing: <strong>${name}</strong>`;
       } else {
         showToast('Failed to create wallet', 'error');
       }
