@@ -573,6 +573,29 @@
       border-top-color: var(--accent-blue);
     }
     
+    /* Wallet Selector */
+    .wallet-selector {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md) var(--space-lg);
+      margin-bottom: var(--space-xl);
+      border: 2px solid rgba(0, 184, 169, 0.15);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .wallet-selector .form-label {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .wallet-selector .form-select {
+      font-family: var(--font-display);
+      font-weight: 600;
+    }
+    
+    .no-wallet-state {
+      margin-bottom: var(--space-xl);
+    }
+    
     /* Wallets List */
     .wallets-list {
       display: flex;
@@ -701,36 +724,28 @@
         </svg>
       </div>
       <h2 class="admin-hero-title">Parent Dashboard</h2>
-      <p class="admin-hero-subtitle">Managing: <strong id="currentWalletName">Loading...</strong></p>
+      <p class="admin-hero-subtitle" id="heroSubtitle">Manage your family's wallets</p>
     </div>
     
-    <!-- Wallet Management -->
-    <div class="admin-section">
-      <div class="admin-section-header">
-        <div class="admin-section-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-          </svg>
-        </div>
-        <h2 class="admin-section-title">Children's Wallets</h2>
-      </div>
-      
-      <div class="admin-card">
-        <div id="walletsList" class="wallets-list">
-          <!-- Wallets loaded dynamically -->
-        </div>
-        
-        <button class="btn btn-secondary btn-full mt-md" onclick="openAddChildModal()">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M12 8v8M8 12h8"/>
-          </svg>
-          Add Another Child
-        </button>
+    <!-- Wallet Selector (for parent mode) -->
+    <div class="wallet-selector" id="walletSelector">
+      <label class="form-label">Viewing wallet:</label>
+      <select class="form-select" id="walletSelect" onchange="switchWallet(this.value)">
+        <option value="">Select a child...</option>
+      </select>
+    </div>
+    
+    <!-- No Wallet Selected State -->
+    <div class="no-wallet-state" id="noWalletState" style="display: none;">
+      <div class="empty-state">
+        <div class="empty-state-icon">👆</div>
+        <p class="empty-state-title">Select a wallet above</p>
+        <p class="empty-state-text">Choose a child's wallet to view their transactions and settings</p>
       </div>
     </div>
+    
+    <!-- Main Content (shown when wallet selected) -->
+    <div id="walletContent">
     
     <!-- Quick Stats -->
     <div class="quick-stats">
@@ -885,6 +900,36 @@
         </div>
       </div>
     </div>
+    
+    <!-- Wallet Management (always visible) -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <h2 class="admin-section-title">All Children's Wallets</h2>
+      </div>
+      
+      <div class="admin-card">
+        <div id="walletsList" class="wallets-list">
+          <!-- Wallets loaded dynamically -->
+        </div>
+        
+        <button class="btn btn-secondary btn-full mt-md" onclick="openAddChildModal()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v8M8 12h8"/>
+          </svg>
+          Add Another Child
+        </button>
+      </div>
+    </div>
+    
+    </div> <!-- end walletContent -->
   </div>
   
   <!-- Edit Transaction Modal -->
@@ -1027,11 +1072,17 @@
     let newPinConfirm = '';
     let setPinMode = 'enter'; // 'enter', 'confirm'
     let setPinTarget = 'parent'; // 'parent'
+    let viewingWalletId = null; // Currently viewing (may differ from device's selected wallet)
+    let isParentMode = false; // True if no wallet selected for this device
     
     // DOM Elements
     const loadingOverlay = document.getElementById('loadingOverlay');
     const mainApp = document.getElementById('mainApp');
     const pinModal = document.getElementById('pinModal');
+    const walletContent = document.getElementById('walletContent');
+    const noWalletState = document.getElementById('noWalletState');
+    const walletSelector = document.getElementById('walletSelector');
+    const walletSelect = document.getElementById('walletSelect');
     
     // Auth check
     onAuthChange((user) => {
@@ -1045,14 +1096,58 @@
     
     // Initialize admin page
     async function initAdmin() {
+      // Check if this device has a wallet selected
+      const deviceWalletId = getSelectedWalletId();
+      isParentMode = !deviceWalletId;
+      
       // Load all wallets first
       await loadWallets();
+      
+      if (isParentMode) {
+        // Parent mode - show wallet selector prominently
+        document.getElementById('heroSubtitle').textContent = 'Manage your family\'s wallets';
+        walletSelector.style.display = 'block';
+        
+        // If there are wallets, auto-select the first one
+        if (allWallets.length > 0) {
+          viewingWalletId = allWallets[0].id;
+          walletSelect.value = viewingWalletId;
+          setSelectedWalletId(viewingWalletId); // Temporarily set for data loading
+          subscribeToCurrentWallet();
+        } else {
+          showNoWalletState();
+        }
+      } else {
+        // Device mode - use the device's wallet
+        viewingWalletId = deviceWalletId;
+        walletSelector.style.display = 'block'; // Still show selector for switching
+        walletSelect.value = viewingWalletId;
+        
+        const currentWallet = allWallets.find(w => w.id === viewingWalletId);
+        document.getElementById('heroSubtitle').innerHTML = `Managing: <strong>${currentWallet?.childName || currentWallet?.name || 'Unknown'}</strong>`;
+        
+        subscribeToCurrentWallet();
+      }
+    }
+    
+    // Subscribe to currently viewed wallet
+    function subscribeToCurrentWallet() {
+      if (!viewingWalletId) {
+        showNoWalletState();
+        return;
+      }
+      
+      // Temporarily set the selected wallet ID for data functions
+      setSelectedWalletId(viewingWalletId);
+      
+      walletContent.style.display = 'block';
+      noWalletState.style.display = 'none';
       
       // Subscribe to wallet updates
       subscribeToWallet((data) => {
         walletData = data;
         
-        // Check if parent PIN is required
+        // Check if parent PIN is required (only for first wallet access)
         if (walletData?.settings?.parentPin && !pinVerified) {
           pinModal.classList.add('active');
           mainApp.style.display = 'none';
@@ -1070,36 +1165,73 @@
       });
     }
     
+    // Switch wallet view
+    window.switchWallet = function(walletId) {
+      if (!walletId) {
+        showNoWalletState();
+        return;
+      }
+      
+      viewingWalletId = walletId;
+      
+      // Update hero subtitle
+      const wallet = allWallets.find(w => w.id === walletId);
+      document.getElementById('heroSubtitle').innerHTML = `Managing: <strong>${wallet?.childName || wallet?.name || 'Unknown'}</strong>`;
+      
+      // Clear current data
+      walletData = null;
+      transactions = [];
+      
+      // Subscribe to new wallet
+      subscribeToCurrentWallet();
+      
+      // Reload wallets list to update "viewing" indicator
+      renderWallets();
+    };
+    
+    // Show no wallet state
+    function showNoWalletState() {
+      walletContent.style.display = 'none';
+      noWalletState.style.display = 'block';
+    }
+    
     // Load all wallets
     async function loadWallets() {
       allWallets = await listWallets();
+      populateWalletSelector();
       renderWallets();
+    }
+    
+    // Populate wallet dropdown
+    function populateWalletSelector() {
+      walletSelect.innerHTML = '<option value="">Select a child...</option>' +
+        allWallets.map(w => `
+          <option value="${w.id}">${w.childName || w.name} (${formatCurrency(w.balance || 0)})</option>
+        `).join('');
     }
     
     // Render wallets list
     function renderWallets() {
       const list = document.getElementById('walletsList');
-      const currentId = getSelectedWalletId();
+      const deviceWalletId = getSelectedWalletId();
       
       if (allWallets.length === 0) {
-        list.innerHTML = '<p class="text-muted text-center">No wallets found</p>';
+        list.innerHTML = '<p class="text-muted text-center">No wallets yet. Add a child to get started!</p>';
         return;
       }
       
-      // Update current wallet name in hero
-      const currentWallet = allWallets.find(w => w.id === currentId);
-      document.getElementById('currentWalletName').textContent = currentWallet?.childName || currentWallet?.name || 'Unknown';
-      
       list.innerHTML = allWallets.map(w => {
-        const isCurrent = w.id === currentId;
+        const isDeviceWallet = w.id === deviceWalletId && !isParentMode;
+        const isViewing = w.id === viewingWalletId;
         return `
-          <div class="wallet-item ${isCurrent ? 'current' : ''}">
+          <div class="wallet-item ${isViewing ? 'current' : ''}" onclick="switchWallet('${w.id}')" style="cursor: pointer;">
             <div class="wallet-item-icon">👦</div>
             <div class="wallet-item-info">
               <p class="wallet-item-name">${w.childName || w.name}</p>
               <p class="wallet-item-balance">${formatCurrency(w.balance || 0)}</p>
             </div>
-            ${isCurrent ? '<span class="wallet-item-badge">This iPad</span>' : ''}
+            ${isDeviceWallet ? '<span class="wallet-item-badge">This iPad</span>' : ''}
+            ${isViewing && !isDeviceWallet ? '<span class="wallet-item-badge" style="background: var(--accent-blue);">Viewing</span>' : ''}
           </div>
         `;
       }).join('');
@@ -1131,6 +1263,10 @@
         closeAddChildModal();
         showToast(`${name}'s wallet created!`, 'success');
         await loadWallets();
+        
+        // Auto-switch to the new wallet
+        switchWallet(walletId);
+        walletSelect.value = walletId;
       } else {
         showToast('Failed to create wallet', 'error');
       }

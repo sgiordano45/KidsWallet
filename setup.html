@@ -425,6 +425,9 @@
         <button class="btn btn-primary setup-btn" onclick="createAndSelectWallet()">
           Continue
         </button>
+        <button class="btn setup-btn setup-btn-secondary" onclick="goToParentDashboard()">
+          I'm a parent managing wallets
+        </button>
       </div>
     </div>
     
@@ -709,6 +712,10 @@
     
     window.finishSetup = function() {
       window.location.href = 'index.html';
+    };
+    
+    window.goToParentDashboard = function() {
+      window.location.href = 'admin.html';
     };
   </script>
 </body>
