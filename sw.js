@@ -1,5 +1,5 @@
 // KidsWallet Service Worker
-const CACHE_NAME = 'kidswallet-v3';
+const CACHE_NAME = 'kidswallet-v4';
 const BASE_PATH = '/KidsWallet';
 const ASSETS = [
   `${BASE_PATH}/`,
@@ -50,7 +50,7 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   
   // Skip Firebase requests
-  if (event.request.url.includes('firestore') ||
+  if (event.request.url.includes('firestore') || 
       event.request.url.includes('firebase') ||
       event.request.url.includes('gstatic') ||
       event.request.url.includes('googleapis')) {
