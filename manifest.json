@@ -2,7 +2,7 @@
   "name": "KidsWallet",
   "short_name": "KidsWallet",
   "description": "Track allowance and savings goals",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f7ff",
   "theme_color": "#00b8a9",
