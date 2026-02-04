@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to My Wallet - Features Guide</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* Guide-specific styles that build on shared.css */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-lg);
+    }
+    
+    /* Navigation */
+    .nav-buttons {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: var(--space-md) var(--space-lg);
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+    
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--bg-card);
+      color: var(--accent-primary);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: 2px solid rgba(0, 184, 169, 0.2);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+    
+    .nav-btn:hover {
+      background: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow-teal);
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      text-align: center;
+      padding: var(--space-2xl) var(--space-lg);
+      border-radius: var(--radius-xl);
+      margin-bottom: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(0, 184, 169, 0.15);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, var(--accent-primary-glow) 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, var(--accent-blue-glow) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, var(--accent-purple-glow) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    
+    .hero-logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto var(--space-lg);
+      background: var(--gradient-primary);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      box-shadow: var(--shadow-glow-teal);
+      animation: bounce 2s ease-in-out infinite;
+      position: relative;
+    }
+    
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 550px;
+      margin: 0 auto var(--space-lg);
+      position: relative;
+    }
+    
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin-top: var(--space-lg);
+      flex-wrap: wrap;
+      position: relative;
+    }
+    
+    .hero-stat {
+      text-align: center;
+    }
+    
+    .hero-stat-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .hero-stat-label {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: var(--gradient-primary);
+      color: white;
+      padding: var(--space-md) var(--space-xl);
+      border-radius: var(--radius-lg);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-decoration: none;
+      margin-top: var(--space-lg);
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-glow-teal);
+      position: relative;
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px var(--accent-primary-glow);
+    }
+    
+    /* Section Styles */
+    .section {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      box-shadow: var(--shadow-md);
+      border: 2px solid rgba(0, 184, 169, 0.1);
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      padding-bottom: var(--space-md);
+      border-bottom: 3px solid var(--accent-primary);
+    }
+    
+    .section-icon {
+      font-size: 2.5rem;
+      width: 70px;
+      height: 70px;
+      background: var(--card-teal);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .section-title {
+      font-family: var(--font-display);
+      color: var(--accent-primary);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+    
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: var(--space-xs);
+    }
+    
+    /* Feature Cards */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-md);
+    }
+    
+    .feature-card {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-glow-teal);
+    }
+    
+    .feature-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .feature-card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .feature-card-desc {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    /* Highlight Cards */
+    .highlight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .highlight-card {
+      background: var(--card-teal);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      position: relative;
+      overflow: hidden;
+      border: 2px solid var(--accent-primary);
+      transition: all var(--transition-fast);
+    }
+    
+    .highlight-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-glow-teal);
+    }
+    
+    .highlight-card-icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-md);
+    }
+    
+    .highlight-card-title {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+      color: var(--accent-primary);
+    }
+    
+    .highlight-card-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    
+    /* Step Cards */
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    
+    .step-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-lg);
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    
+    .step-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: var(--shadow-glow-blue);
+    }
+    
+    .step-number {
+      background: var(--gradient-primary);
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-glow-teal);
+    }
+    
+    .step-content h3 {
+      font-family: var(--font-display);
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+      font-size: 1.1rem;
+    }
+    
+    .step-content p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    /* Calculator Preview */
+    .calc-preview {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-top: var(--space-lg);
+      border: 2px solid rgba(245, 158, 11, 0.3);
+    }
+    
+    .calc-title {
+      font-family: var(--font-display);
+      color: var(--accent-gold);
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .calc-row:last-child {
+      border-bottom: none;
+      padding-top: var(--space-md);
+      margin-top: var(--space-sm);
+      border-top: 2px dashed var(--accent-gold);
+    }
+    
+    .calc-label {
+      color: var(--text-secondary);
+    }
+    
+    .calc-value {
+      font-family: var(--font-display);
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .calc-row:last-child .calc-value {
+      color: var(--accent-gold);
+      font-size: 1.1rem;
+    }
+    
+    /* Tip Box */
+    .tip-box {
+      background: var(--card-gold);
+      border-left: 4px solid var(--accent-gold);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      margin-top: var(--space-lg);
+    }
+    
+    .tip-box-title {
+      font-family: var(--font-display);
+      color: var(--accent-gold);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .tip-box p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    
+    /* Parent Section */
+    .section.parent-section {
+      background: var(--card-blue);
+      border-color: var(--accent-blue);
+    }
+    
+    .section.parent-section .section-header {
+      border-bottom-color: var(--accent-blue);
+    }
+    
+    .section.parent-section .section-icon {
+      background: rgba(59, 130, 246, 0.15);
+    }
+    
+    .section.parent-section .section-title {
+      color: var(--accent-blue);
+    }
+    
+    .parent-feature-card {
+      background: rgba(255,255,255,0.7);
+      border: 2px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    .parent-feature-card:hover {
+      border-color: var(--accent-blue);
+      box-shadow: var(--shadow-glow-blue);
+    }
+    
+    .parent-tip-box {
+      background: rgba(59, 130, 246, 0.1);
+      border-left-color: var(--accent-blue);
+    }
+    
+    .parent-tip-box .tip-box-title {
+      color: var(--accent-blue);
+    }
+    
+    /* Final CTA */
+    .final-cta {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-lg);
+      text-align: center;
+      border: 2px solid rgba(0, 184, 169, 0.2);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 30% 20%, var(--accent-primary-glow) 0%, transparent 40%),
+        radial-gradient(circle at 70% 80%, var(--accent-purple-glow) 0%, transparent 40%);
+      pointer-events: none;
+    }
+    
+    .final-cta h2 {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      margin-bottom: var(--space-md);
+      background: var(--gradient-fun);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+    }
+    
+    .final-cta p {
+      color: var(--text-secondary);
+      max-width: 450px;
+      margin: 0 auto var(--space-lg);
+      position: relative;
+    }
+    
+    .quick-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-top: var(--space-xl);
+      flex-wrap: wrap;
+      position: relative;
+    }
+    
+    .quick-link {
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      font-family: var(--font-display);
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      border: 2px solid transparent;
+    }
+    
+    .quick-link:hover {
+      background: var(--bg-card);
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+      
+      .hero-stats {
+        gap: var(--space-lg);
+      }
+      
+      .section {
+        padding: var(--space-lg);
+      }
+      
+      .step-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      
+      .section-header {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Navigation -->
+  <div class="nav-buttons">
+    <a href="index.html" class="nav-btn">← Back to App</a>
+  </div>
+  
+  <div class="container">
+    
+    <!-- Hero Section -->
+    <div class="hero">
+      <div class="hero-logo">💰</div>
+      <h1>Welcome to My Wallet</h1>
+      <p class="hero-subtitle">
+        The fun, easy way for kids to track their allowance, watch their savings grow, 
+        and learn smart money habits!
+      </p>
+      
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-icon">📈</div>
+          <div class="hero-stat-label">Earn Interest</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-icon">🎯</div>
+          <div class="hero-stat-label">Track Spending</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-icon">🏆</div>
+          <div class="hero-stat-label">Reach Goals</div>
+        </div>
+      </div>
+      
+      <a href="index.html" class="cta-button">Open My Wallet →</a>
+    </div>
+    
+    <!-- CORE FEATURES -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">✨</div>
+        <div>
+          <div class="section-title">Core Features</div>
+          <div class="section-subtitle">Everything you need to manage your money</div>
+        </div>
+      </div>
+      
+      <div class="highlight-grid">
+        <div class="highlight-card">
+          <div class="highlight-card-icon">💵</div>
+          <div class="highlight-card-title">Track Your Balance</div>
+          <div class="highlight-card-desc">
+            See exactly how much money you have at a glance. Your balance updates 
+            instantly whenever you earn or spend money.
+          </div>
+        </div>
+        
+        <div class="highlight-card">
+          <div class="highlight-card-icon">📊</div>
+          <div class="highlight-card-title">Monthly Interest</div>
+          <div class="highlight-card-desc">
+            Watch your savings grow! Earn interest on your balance every month. 
+            The more you save, the more you earn.
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- HOW IT WORKS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🎮</div>
+        <div>
+          <div class="section-title">How It Works</div>
+          <div class="section-subtitle">Simple steps to start growing your savings</div>
+        </div>
+      </div>
+      
+      <div class="steps-container stagger-children">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Earn Your Allowance</h3>
+            <p>Complete your chores, then tap the <strong>"I Earned My Allowance"</strong> button. 
+            Your allowance amount gets added to your balance instantly — with a fun confetti celebration!</p>
+          </div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Add Other Money</h3>
+            <p>Got birthday money? Gift from grandma? Tap <strong>"Add Money"</strong> and enter the amount 
+            and what it's from. Every deposit is tracked in your history.</p>
+          </div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Track Your Spending</h3>
+            <p>When you buy something, tap <strong>"Spend Money"</strong> and record what you spent. 
+            This helps you see where your money goes and make smarter choices.</p>
+          </div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Watch It Grow</h3>
+            <p>On the 1st of each month, you automatically earn interest on your savings! 
+            The longer you save, the more you earn thanks to compound interest.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- COMPOUND INTEREST EXPLAINED -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🧮</div>
+        <div>
+          <div class="section-title">The Magic of Compound Interest</div>
+          <div class="section-subtitle">How your money grows even while you sleep</div>
+        </div>
+      </div>
+      
+      <p style="color: var(--text-secondary); margin-bottom: var(--space-md);">
+        Compound interest is when you earn interest not just on your original savings, 
+        but also on the interest you've already earned. It's like a snowball rolling downhill — 
+        it keeps getting bigger!
+      </p>
+      
+      <div class="calc-preview">
+        <div class="calc-title">
+          📈 Example: $100 with 5% monthly interest
+        </div>
+        <div class="calc-row">
+          <span class="calc-label">Starting Balance</span>
+          <span class="calc-value">$100.00</span>
+        </div>
+        <div class="calc-row">
+          <span class="calc-label">Month 1 Interest (+5%)</span>
+          <span class="calc-value">+ $5.00 → $105.00</span>
+        </div>
+        <div class="calc-row">
+          <span class="calc-label">Month 2 Interest (+5%)</span>
+          <span class="calc-value">+ $5.25 → $110.25</span>
+        </div>
+        <div class="calc-row">
+          <span class="calc-label">Month 3 Interest (+5%)</span>
+          <span class="calc-value">+ $5.51 → $115.76</span>
+        </div>
+        <div class="calc-row">
+          <span class="calc-label">After 12 Months</span>
+          <span class="calc-value">$179.59 🎉</span>
+        </div>
+      </div>
+      
+      <div class="tip-box">
+        <div class="tip-box-title">💡 Pro Tip</div>
+        <p>
+          The less you spend, the more interest you earn! Every dollar in your wallet works 
+          hard to make you more money.
+        </p>
+      </div>
+    </div>
+    
+    <!-- TRANSACTION HISTORY -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">📜</div>
+        <div>
+          <div class="section-title">Transaction History</div>
+          <div class="section-subtitle">See every deposit, purchase, and interest payment</div>
+        </div>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-card-icon">🟢</div>
+          <div class="feature-card-title">Deposits</div>
+          <div class="feature-card-desc">
+            Allowance, gifts, and other money added to your wallet shows in green 
+            with a description of where it came from.
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-card-icon">🔴</div>
+          <div class="feature-card-title">Purchases</div>
+          <div class="feature-card-desc">
+            Money you spend shows in red. Track what you bought so you can 
+            see your spending patterns over time.
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-card-icon">✨</div>
+          <div class="feature-card-title">Interest Earned</div>
+          <div class="feature-card-desc">
+            Monthly interest payments appear automatically, showing you 
+            exactly how much your savings earned.
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-card-icon">📅</div>
+          <div class="feature-card-title">Date & Time</div>
+          <div class="feature-card-desc">
+            Every transaction is timestamped so you can look back 
+            and see when things happened.
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- FOR PARENTS -->
+    <div class="section parent-section">
+      <div class="section-header">
+        <div class="section-icon">👨‍👩‍👧</div>
+        <div>
+          <div class="section-title">For Parents</div>
+          <div class="section-subtitle">Settings, security & multi-child support</div>
+        </div>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card parent-feature-card">
+          <div class="feature-card-icon">🔐</div>
+          <div class="feature-card-title">Parent PIN</div>
+          <div class="feature-card-desc">
+            Protect settings and reset functions with a secure PIN. 
+            Only parents can change interest rates or clear data.
+          </div>
+        </div>
+        
+        <div class="feature-card parent-feature-card">
+          <div class="feature-card-icon">⚙️</div>
+          <div class="feature-card-title">Customizable Settings</div>
+          <div class="feature-card-desc">
+            Set the allowance amount, interest rate, and other options 
+            to match your family's approach.
+          </div>
+        </div>
+        
+        <div class="feature-card parent-feature-card">
+          <div class="feature-card-icon">👨‍👧‍👦</div>
+          <div class="feature-card-title">Multiple Wallets</div>
+          <div class="feature-card-desc">
+            Have multiple kids? Each child gets their own wallet with 
+            separate balances, settings, and history.
+          </div>
+        </div>
+        
+        <div class="feature-card parent-feature-card">
+          <div class="feature-card-icon">☁️</div>
+          <div class="feature-card-title">Cloud Sync</div>
+          <div class="feature-card-desc">
+            Data syncs across devices with secure Google sign-in. 
+            Access the wallet from any iPad, phone, or computer.
+          </div>
+        </div>
+      </div>
+      
+      <div class="tip-box parent-tip-box">
+        <div class="tip-box-title">💡 Tips for Parents</div>
+        <p>
+          <strong>Be consistent</strong> — Regular allowance builds habits.<br>
+          <strong>Let them spend</strong> — Making purchase decisions is part of learning.<br>
+          <strong>Review together</strong> — Look at the transaction history weekly.<br>
+          <strong>Celebrate milestones</strong> — Savings goals reached deserve recognition!
+        </p>
+      </div>
+    </div>
+    
+    <!-- INSTALL AS APP -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">📱</div>
+        <div>
+          <div class="section-title">Install as an App</div>
+          <div class="section-subtitle">Add to your home screen for the best experience</div>
+        </div>
+      </div>
+      
+      <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+        My Wallet works like a real app when you add it to your home screen. 
+        It even works offline!
+      </p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-card-icon">🍎</div>
+          <div class="feature-card-title">iPad / iPhone</div>
+          <div class="feature-card-desc">
+            Open in <strong>Safari</strong> → Tap the <strong>Share</strong> button (square with arrow) 
+            → Scroll down and tap <strong>"Add to Home Screen"</strong>
+          </div>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-card-icon">🤖</div>
+          <div class="feature-card-title">Android</div>
+          <div class="feature-card-desc">
+            Open in <strong>Chrome</strong> → Tap the <strong>menu</strong> (three dots) 
+            → Tap <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tip-box">
+        <div class="tip-box-title">✨ Why install it?</div>
+        <p>
+          When installed, the app launches full-screen without browser bars, 
+          works offline, and feels just like a native app!
+        </p>
+      </div>
+    </div>
+    
+    <!-- GETTING STARTED -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">🚀</div>
+        <div>
+          <div class="section-title">Getting Started</div>
+          <div class="section-subtitle">Set up your wallet in minutes</div>
+        </div>
+      </div>
+      
+      <div class="steps-container stagger-children">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Sign In</h3>
+            <p>Tap "Sign in with Google" using a parent's Google account. 
+            This keeps your data secure and synced across devices.</p>
+          </div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Set Up Your Wallet</h3>
+            <p>Enter your child's name to create their wallet. 
+            You can add more wallets later for other kids.</p>
+          </div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Configure Settings</h3>
+            <p>Tap the gear icon to set the allowance amount, interest rate, 
+            and your parent PIN for security.</p>
+          </div>
+        </div>
+        
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Start Saving!</h3>
+            <p>Add an initial balance if you'd like, or start fresh. 
+            When your child earns their allowance, they tap the button to add it!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- FINAL CTA -->
+    <div class="final-cta">
+      <h2>Ready to Start Saving?</h2>
+      <p>
+        Open My Wallet and watch your savings grow with the power of compound interest!
+      </p>
+      <a href="index.html" class="cta-button">Open My Wallet →</a>
+      
+      <div class="quick-links">
+        <a href="index.html" class="quick-link">💰 My Wallet</a>
+        <a href="admin.html" class="quick-link">⚙️ Admin Panel</a>
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>
