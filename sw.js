@@ -1,5 +1,5 @@
 // KidsWallet Service Worker
-const CACHE_NAME = 'kidswallet-v4';
+const CACHE_NAME = 'kidswallet-v5';
 const BASE_PATH = '/KidsWallet';
 const ASSETS = [
   `${BASE_PATH}/`,

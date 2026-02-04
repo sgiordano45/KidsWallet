@@ -519,6 +519,7 @@
       createWallet,
       setSelectedWalletId,
       getSelectedWalletId,
+      setParentPin,
       updateWalletData,
       getWalletData,
       triggerMigration,
@@ -683,14 +684,9 @@
         document.getElementById('pinSubtitle').textContent = 'Confirm your PIN';
       } else {
         if (parentPin === pinFirstEntry) {
-          // Save PIN
+          // Save PIN to family level
           loadingOverlay.classList.remove('hidden');
-          await updateWalletData({
-            settings: {
-              ...(await getWalletData()).settings,
-              parentPin: parentPin
-            }
-          });
+          await setParentPin(parentPin);
           loadingOverlay.classList.add('hidden');
           
           showToast('Parent PIN set!', 'success');

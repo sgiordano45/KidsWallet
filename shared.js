@@ -273,6 +273,17 @@ export async function updateFamilyInfo(updates) {
   }
 }
 
+// Get parent PIN (family-level)
+export async function getParentPin() {
+  const family = await getFamilyInfo();
+  return family?.parentPin || null;
+}
+
+// Set parent PIN (family-level)
+export async function setParentPin(pin) {
+  await updateFamilyInfo({ parentPin: pin });
+}
+
 // ============================================
 // WALLET MANAGEMENT (Multi-child support)
 // ============================================

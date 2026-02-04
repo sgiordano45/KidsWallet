@@ -783,6 +783,7 @@
         <div class="pin-row">
           <div class="pin-info">
             <p class="pin-label">Parent PIN</p>
+            <p class="form-hint" style="margin: 0;">Shared across all wallets</p>
             <p class="pin-value" id="parentPinDisplay">Not set</p>
           </div>
           <button class="btn btn-sm btn-secondary" onclick="openSetPinModal('parent')">
@@ -793,6 +794,7 @@
         <div class="pin-row">
           <div class="pin-info">
             <p class="pin-label">Kid's PIN</p>
+            <p class="form-hint" style="margin: 0;">For this wallet only</p>
             <p class="pin-value" id="kidPinDisplay">Not set</p>
           </div>
           <button class="btn btn-sm btn-secondary" onclick="resetKidPin()" id="kidPinBtn" style="display: none;">
@@ -1043,6 +1045,9 @@
       onAuthChange,
       getWalletData,
       updateWalletData,
+      getFamilyInfo,
+      getParentPin,
+      setParentPin,
       subscribeToWallet,
       subscribeToTransactions,
       getTransactions,
@@ -1068,6 +1073,7 @@
     let currentFilter = 'all';
     let enteredPin = '';
     let pinVerified = false;
+    let familyPin = null; // Family-level parent PIN
     let newPinValue = '';
     let newPinConfirm = '';
     let setPinMode = 'enter'; // 'enter', 'confirm'
@@ -1096,6 +1102,22 @@
     
     // Initialize admin page
     async function initAdmin() {
+      // Check family-level parent PIN first
+      const familyParentPin = await getParentPin();
+      if (familyParentPin && !pinVerified) {
+        familyPin = familyParentPin;
+        pinModal.classList.add('active');
+        mainApp.style.display = 'none';
+        return; // Wait for PIN verification
+      }
+      
+      pinVerified = true;
+      mainApp.style.display = 'block';
+      await continueAdminInit();
+    }
+    
+    // Continue initialization after PIN verified
+    async function continueAdminInit() {
       // Check if this device has a wallet selected
       const deviceWalletId = getSelectedWalletId();
       isParentMode = !deviceWalletId;
@@ -1115,7 +1137,6 @@
           </div>
         `;
         noWalletState.style.display = 'block';
-        mainApp.style.display = 'block';
         document.getElementById('heroSubtitle').textContent = 'Set up your family\'s wallets';
         return;
       }
@@ -1159,16 +1180,7 @@
       // Subscribe to wallet updates
       subscribeToWallet((data) => {
         walletData = data;
-        
-        // Check if parent PIN is required (only for first wallet access)
-        if (walletData?.settings?.parentPin && !pinVerified) {
-          pinModal.classList.add('active');
-          mainApp.style.display = 'none';
-        } else {
-          pinVerified = true;
-          mainApp.style.display = 'block';
-          updateUI();
-        }
+        updateUI();
       });
       
       // Subscribe to transactions
@@ -1305,7 +1317,7 @@
     };
     
     // Update UI with wallet data
-    function updateUI() {
+    async function updateUI() {
       if (!walletData) return;
       
       // Stats
@@ -1315,8 +1327,8 @@
       document.getElementById('statSpent').textContent = formatCurrency(walletData.totalSpent || 0);
       document.getElementById('currentBalanceDisplay').textContent = formatCurrency(walletData.balance || 0);
       
-      // PIN displays
-      const parentPin = walletData.settings?.parentPin;
+      // PIN displays - Parent PIN is family-level
+      const parentPin = await getParentPin();
       const kidPin = walletData.settings?.kidPin;
       
       const parentPinDisplay = document.getElementById('parentPinDisplay');
@@ -1444,12 +1456,11 @@
     };
     
     function verifyPin() {
-      const correctPin = walletData?.settings?.parentPin;
-      if (enteredPin === correctPin) {
+      if (enteredPin === familyPin) {
         pinVerified = true;
         pinModal.classList.remove('active');
         mainApp.style.display = 'block';
-        updateUI();
+        continueAdminInit();
       } else {
         showToast('Wrong PIN!', 'error');
         enteredPin = '';
@@ -1528,16 +1539,14 @@
         return;
       }
       
-      await updateWalletData({
-        settings: {
-          ...walletData.settings,
-          parentPin: newPinValue
-        }
-      });
+      // Save to family level
+      await setParentPin(newPinValue);
+      familyPin = newPinValue;
       
       closeSetPinModal();
       showToast('Parent PIN saved!', 'success');
       pinVerified = true;
+      updateUI();
     }
     
     // Reset kid PIN
