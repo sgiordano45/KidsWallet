@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>My Goals - KidsWallet</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* Goals Page Specific Styles */
+    
+    /* Balance Preview */
+    .balance-preview {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md) var(--space-lg);
+      margin-bottom: var(--space-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .balance-preview-label {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    
+    .balance-preview-amount {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+    
+    /* Add Goal Button */
+    .add-goal-btn {
+      width: 100%;
+      padding: var(--space-lg);
+      margin-bottom: var(--space-xl);
+      background: var(--bg-card);
+      border: 2px dashed rgba(255, 215, 0, 0.3);
+      border-radius: var(--radius-xl);
+      color: var(--accent-gold);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      transition: all var(--transition-normal);
+    }
+    
+    .add-goal-btn:hover {
+      background: rgba(255, 215, 0, 0.1);
+      border-color: var(--accent-gold);
+      box-shadow: var(--shadow-glow-gold);
+    }
+    
+    .add-goal-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .add-goal-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    /* Goals List */
+    .goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+    
+    /* Goal Card */
+    .goal-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--space-lg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all var(--transition-normal);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .goal-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-gold);
+      opacity: 0.5;
+    }
+    
+    .goal-card:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .goal-card.completed {
+      opacity: 0.7;
+    }
+    
+    .goal-card.completed::before {
+      background: var(--gradient-green);
+      opacity: 1;
+    }
+    
+    .goal-card.achievable::before {
+      background: var(--gradient-green);
+      animation: pulse 2s infinite;
+    }
+    
+    .goal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+    
+    .goal-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 215, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .goal-card.completed .goal-icon {
+      background: rgba(0, 214, 125, 0.15);
+    }
+    
+    .goal-card.achievable .goal-icon {
+      background: rgba(0, 214, 125, 0.15);
+      animation: pulse 2s infinite;
+    }
+    
+    .goal-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
+    
+    .goal-action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-secondary);
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    
+    .goal-action-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+    
+    .goal-action-btn.delete:hover {
+      color: var(--accent-red);
+    }
+    
+    .goal-action-btn.complete:hover {
+      color: var(--accent-green);
+    }
+    
+    .goal-action-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .goal-info {
+      margin-bottom: var(--space-md);
+    }
+    
+    .goal-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .goal-card.completed .goal-name {
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+    
+    .goal-cost {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    
+    .goal-cost strong {
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+    
+    .goal-card.completed .goal-cost strong {
+      color: var(--accent-green);
+    }
+    
+    /* Progress Bar */
+    .goal-progress {
+      margin-bottom: var(--space-sm);
+    }
+    
+    .progress-bar {
+      height: 12px;
+      background: var(--bg-secondary);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: var(--gradient-gold);
+      border-radius: 6px;
+      transition: width var(--transition-slow) ease-out;
+      position: relative;
+    }
+    
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    .goal-card.completed .progress-fill,
+    .goal-card.achievable .progress-fill {
+      background: var(--gradient-green);
+    }
+    
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: var(--space-xs);
+    }
+    
+    .progress-text .saved {
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+    
+    .goal-card.completed .progress-text .saved,
+    .goal-card.achievable .progress-text .saved {
+      color: var(--accent-green);
+    }
+    
+    /* Goal Status */
+    .goal-status {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(0, 214, 125, 0.1);
+      border-radius: var(--radius-sm);
+      margin-top: var(--space-md);
+    }
+    
+    .goal-status-icon {
+      color: var(--accent-green);
+    }
+    
+    .goal-status-text {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--accent-green);
+    }
+    
+    /* Completed Badge */
+    .completed-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--accent-green);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      margin-top: var(--space-md);
+    }
+    
+    .completed-badge svg {
+      width: 14px;
+      height: 14px;
+    }
+    
+    /* Emoji Picker */
+    .emoji-picker {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    
+    .emoji-btn {
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      background: var(--bg-secondary);
+      border: 2px solid transparent;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .emoji-btn:hover {
+      background: var(--bg-elevated);
+      transform: scale(1.1);
+    }
+    
+    .emoji-btn.selected {
+      border-color: var(--accent-gold);
+      background: rgba(255, 215, 0, 0.1);
+    }
+    
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+    
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+    
+    .goals-count {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      background: var(--bg-card);
+      padding: var(--space-xs);
+      border-radius: var(--radius-lg);
+    }
+    
+    .tab {
+      flex: 1;
+      padding: var(--space-sm) var(--space-md);
+      background: none;
+      border: none;
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .tab:hover {
+      color: var(--text-secondary);
+    }
+    
+    .tab.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <a href="index.html" class="header-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Home
+      </a>
+      <h1 class="header-title">My Goals</h1>
+      <div style="width: 60px;"></div>
+    </header>
+    
+    <!-- Balance Preview -->
+    <div class="balance-preview animate-slide-up">
+      <span class="balance-preview-label">Available to save</span>
+      <span class="balance-preview-amount" id="availableBalance">$0.00</span>
+    </div>
+    
+    <!-- Add Goal Button -->
+    <button class="add-goal-btn" onclick="openAddGoalModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 8v8M8 12h8"/>
+      </svg>
+      Add New Goal
+    </button>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="active" onclick="switchTab('active')">Active</button>
+      <button class="tab" data-tab="completed" onclick="switchTab('completed')">Completed</button>
+    </div>
+    
+    <!-- Goals List -->
+    <div class="goals-list" id="goalsList">
+      <div class="empty-state">
+        <div class="empty-state-icon">🎯</div>
+        <p class="empty-state-title">No goals yet</p>
+        <p class="empty-state-text">What are you saving for?</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add/Edit Goal Modal -->
+  <div class="modal-overlay" id="goalModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title" id="goalModalTitle">New Goal</h2>
+      
+      <div class="form-group">
+        <label class="form-label">Pick an icon</label>
+        <div class="emoji-picker" id="emojiPicker">
+          <button type="button" class="emoji-btn selected" data-emoji="🎮">🎮</button>
+          <button type="button" class="emoji-btn" data-emoji="🚲">🚲</button>
+          <button type="button" class="emoji-btn" data-emoji="📱">📱</button>
+          <button type="button" class="emoji-btn" data-emoji="🎧">🎧</button>
+          <button type="button" class="emoji-btn" data-emoji="⚽">⚽</button>
+          <button type="button" class="emoji-btn" data-emoji="🎨">🎨</button>
+          <button type="button" class="emoji-btn" data-emoji="📚">📚</button>
+          <button type="button" class="emoji-btn" data-emoji="🎸">🎸</button>
+          <button type="button" class="emoji-btn" data-emoji="🛹">🛹</button>
+          <button type="button" class="emoji-btn" data-emoji="🎁">🎁</button>
+          <button type="button" class="emoji-btn" data-emoji="✈️">✈️</button>
+          <button type="button" class="emoji-btn" data-emoji="⭐">⭐</button>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">What are you saving for?</label>
+        <input type="text" class="form-input" id="goalNameInput" placeholder="e.g., New video game, Bicycle...">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">How much does it cost?</label>
+        <input type="number" class="form-input amount" id="goalCostInput" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeGoalModal()">Cancel</button>
+        <button class="btn btn-primary" id="saveGoalBtn" onclick="saveGoal()">Save Goal</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import {
+      getWalletData,
+      subscribeToWallet,
+      subscribeToGoals,
+      addGoal,
+      updateGoal,
+      deleteGoal,
+      formatCurrency,
+      showToast,
+      getLocalData
+    } from './shared.js';
+    
+    // State
+    let walletData = null;
+    let goals = [];
+    let currentTab = 'active';
+    let selectedEmoji = '🎮';
+    let editingGoalId = null;
+    
+    // DOM Elements
+    const availableBalanceEl = document.getElementById('availableBalance');
+    const goalsListEl = document.getElementById('goalsList');
+    
+    // Update Balance Display
+    function updateBalance() {
+      const balance = walletData?.balance || 0;
+      availableBalanceEl.textContent = formatCurrency(balance);
+    }
+    
+    // Render Goals
+    function renderGoals() {
+      const filteredGoals = goals.filter(g => 
+        currentTab === 'active' ? !g.completed : g.completed
+      );
+      
+      if (filteredGoals.length === 0) {
+        goalsListEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">${currentTab === 'active' ? '🎯' : '🏆'}</div>
+            <p class="empty-state-title">${currentTab === 'active' ? 'No active goals' : 'No completed goals yet'}</p>
+            <p class="empty-state-text">${currentTab === 'active' ? 'What are you saving for?' : 'Keep saving!'}</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const balance = walletData?.balance || 0;
+      
+      goalsListEl.innerHTML = filteredGoals.map(goal => {
+        const progress = Math.min((balance / goal.cost) * 100, 100);
+        const canAfford = balance >= goal.cost;
+        const remaining = Math.max(goal.cost - balance, 0);
+        
+        let cardClass = 'goal-card';
+        if (goal.completed) cardClass += ' completed';
+        else if (canAfford) cardClass += ' achievable';
+        
+        return `
+          <div class="${cardClass}" data-id="${goal.id}">
+            <div class="goal-header">
+              <div class="goal-icon">${goal.emoji || '🎯'}</div>
+              <div class="goal-actions">
+                ${!goal.completed && canAfford ? `
+                  <button class="goal-action-btn complete" onclick="completeGoal('${goal.id}')" title="Mark as purchased">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                  </button>
+                ` : ''}
+                <button class="goal-action-btn delete" onclick="confirmDeleteGoal('${goal.id}')" title="Delete goal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="goal-info">
+              <h3 class="goal-name">${goal.name}</h3>
+              <p class="goal-cost">Goal: <strong>${formatCurrency(goal.cost)}</strong></p>
+            </div>
+            
+            ${!goal.completed ? `
+              <div class="goal-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <div class="progress-text">
+                  <span class="saved">${formatCurrency(Math.min(balance, goal.cost))} saved</span>
+                  <span>${remaining > 0 ? formatCurrency(remaining) + ' to go' : 'Ready!'}</span>
+                </div>
+              </div>
+              ${canAfford ? `
+                <div class="goal-status">
+                  <svg class="goal-status-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                    <path d="M22 4L12 14.01l-3-3"/>
+                  </svg>
+                  <span class="goal-status-text">You can buy this now!</span>
+                </div>
+              ` : ''}
+            ` : `
+              <div class="completed-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M20 6L9 17l-5-5"/>
+                </svg>
+                Purchased!
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Tab Switching
+    window.switchTab = function(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+      renderGoals();
+    };
+    
+    // Modal Functions
+    window.openAddGoalModal = function() {
+      editingGoalId = null;
+      document.getElementById('goalModalTitle').textContent = 'New Goal';
+      document.getElementById('goalNameInput').value = '';
+      document.getElementById('goalCostInput').value = '';
+      selectedEmoji = '🎮';
+      updateEmojiSelection();
+      document.getElementById('goalModal').classList.add('active');
+      
+      setTimeout(() => {
+        document.getElementById('goalNameInput').focus();
+      }, 300);
+    };
+    
+    window.closeGoalModal = function() {
+      document.getElementById('goalModal').classList.remove('active');
+    };
+    
+    function updateEmojiSelection() {
+      document.querySelectorAll('.emoji-btn').forEach(btn => {
+        btn.classList.toggle('selected', btn.dataset.emoji === selectedEmoji);
+      });
+    }
+    
+    // Emoji Picker
+    document.getElementById('emojiPicker').addEventListener('click', (e) => {
+      const btn = e.target.closest('.emoji-btn');
+      if (btn) {
+        selectedEmoji = btn.dataset.emoji;
+        updateEmojiSelection();
+      }
+    });
+    
+    // Save Goal
+    window.saveGoal = async function() {
+      const name = document.getElementById('goalNameInput').value.trim();
+      const cost = parseFloat(document.getElementById('goalCostInput').value);
+      
+      if (!name) {
+        showToast('Please enter a goal name', 'error');
+        return;
+      }
+      
+      if (!cost || cost <= 0) {
+        showToast('Please enter a valid cost', 'error');
+        return;
+      }
+      
+      if (editingGoalId) {
+        await updateGoal(editingGoalId, { name, cost, emoji: selectedEmoji });
+        showToast('Goal updated!', 'success');
+      } else {
+        await addGoal({ name, cost, emoji: selectedEmoji });
+        showToast('Goal added!', 'success');
+      }
+      
+      closeGoalModal();
+      
+      // Refresh goals from local storage
+      goals = getLocalData('goals', []);
+      renderGoals();
+    };
+    
+    // Complete Goal
+    window.completeGoal = async function(goalId) {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      if (confirm(`Mark "${goal.name}" as purchased?`)) {
+        await updateGoal(goalId, { 
+          completed: true,
+          completedAt: new Date().toISOString()
+        });
+        showToast('Congratulations! 🎉', 'success');
+        
+        // Refresh
+        goals = getLocalData('goals', []);
+        renderGoals();
+      }
+    };
+    
+    // Delete Goal
+    window.confirmDeleteGoal = async function(goalId) {
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) return;
+      
+      if (confirm(`Delete "${goal.name}"?`)) {
+        await deleteGoal(goalId);
+        showToast('Goal deleted', 'success');
+        
+        // Refresh
+        goals = getLocalData('goals', []);
+        renderGoals();
+      }
+    };
+    
+    // Initialize
+    async function init() {
+      // Subscribe to wallet updates
+      subscribeToWallet((data) => {
+        walletData = data;
+        updateBalance();
+        renderGoals();
+      });
+      
+      // Subscribe to goals updates
+      subscribeToGoals((data) => {
+        goals = data;
+        renderGoals();
+      });
+      
+      // Fallback load
+      setTimeout(() => {
+        if (!walletData) {
+          getWalletData().then(data => {
+            walletData = data;
+            updateBalance();
+            renderGoals();
+          });
+        }
+        if (goals.length === 0) {
+          goals = getLocalData('goals', []);
+          renderGoals();
+        }
+      }, 1000);
+      
+      // Check URL params
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('action') === 'new') {
+        setTimeout(() => openAddGoalModal(), 500);
+      }
+    }
+    
+    // Start
+    init();
+  </script>
+</body>
+</html>

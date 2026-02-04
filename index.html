@@ -2,1565 +2,451 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="My Wallet">
-  <meta name="theme-color" content="#1a1a2e">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>KidsWallet</title>
+  
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <title>My Wallet - Allowance Tracker</title>
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="shared.css">
   <style>
-    :root {
-      --bg-primary: #0f0f1a;
-      --bg-secondary: #1a1a2e;
-      --bg-card: #252542;
-      --bg-card-hover: #2d2d4a;
-      --accent-green: #00d9a5;
-      --accent-green-dim: rgba(0, 217, 165, 0.15);
-      --accent-coral: #ff6b6b;
-      --accent-coral-dim: rgba(255, 107, 107, 0.15);
-      --accent-gold: #ffd93d;
-      --accent-purple: #a855f7;
-      --text-primary: #ffffff;
-      --text-secondary: #8b8ba7;
-      --text-dim: #5a5a7a;
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --shadow-glow: 0 0 60px rgba(0, 217, 165, 0.15);
+    /* Home Page Specific Styles */
+    .home-header {
+      text-align: center;
+      padding: var(--space-xl) 0;
+      margin-bottom: var(--space-lg);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    body {
-      font-family: 'Outfit', -apple-system, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.5;
-    }
-
-    .app {
-      height: 100%;
+    
+    .home-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto var(--space-lg);
+      background: var(--gradient-green);
+      border-radius: var(--radius-xl);
       display: flex;
-      flex-direction: column;
-      max-width: 600px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    /* Background Effects */
-    .bg-gradient {
-      position: fixed;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(0, 217, 165, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(255, 217, 61, 0.04) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-      animation: bgPulse 15s ease-in-out infinite;
-    }
-
-    @keyframes bgPulse {
-      0%, 100% { transform: scale(1) rotate(0deg); }
-      50% { transform: scale(1.1) rotate(5deg); }
-    }
-
-    /* Header */
-    header {
-      padding: 20px 24px 16px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .header-top {
-      display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      justify-content: center;
+      box-shadow: var(--shadow-glow-green);
+      animation: scaleIn 0.5s ease forwards;
     }
-
-    .greeting {
-      font-size: 14px;
-      color: var(--text-secondary);
-      font-weight: 400;
+    
+    .home-logo svg {
+      width: 48px;
+      height: 48px;
+      color: #000;
     }
-
-    .app-title {
-      font-family: 'Space Mono', monospace;
-      font-size: 20px;
+    
+    .home-title {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--accent-green), var(--accent-gold));
+      margin-bottom: var(--space-sm);
+      background: linear-gradient(135deg, #fff 0%, #a0a0b0 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      animation: slideUp 0.5s ease 0.1s forwards;
+      opacity: 0;
     }
-
-    .settings-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
+    
+    .home-subtitle {
       color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      font-size: 1.1rem;
+      animation: slideUp 0.5s ease 0.2s forwards;
+      opacity: 0;
     }
-
-    .settings-btn:hover {
-      background: var(--bg-card-hover);
-      color: var(--text-primary);
+    
+    /* Balance Preview */
+    .balance-preview {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      animation: slideUp 0.5s ease 0.3s forwards;
+      opacity: 0;
     }
-
-    /* Main Content */
-    main {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 0 24px 100px;
-      position: relative;
-      z-index: 10;
-      -webkit-overflow-scrolling: touch;
+    
+    .balance-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
     }
-
-    /* Balance Card */
-    .balance-card {
-      background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
-      border-radius: 24px;
-      padding: 28px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border-subtle);
+    
+    .balance-amount {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--accent-green);
+      text-shadow: 0 0 40px var(--accent-green-glow);
+    }
+    
+    /* Tiles Grid */
+    .tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .tile {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      text-decoration: none;
+      color: inherit;
+      border: 2px solid transparent;
+      transition: all var(--transition-normal);
       position: relative;
       overflow: hidden;
-      box-shadow: var(--shadow-glow);
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
     }
-
-    .balance-card::before {
+    
+    .tile::before {
       content: '';
       position: absolute;
       top: 0;
-      right: 0;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, var(--accent-green-dim) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .balance-label {
-      font-size: 13px;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 500;
-      margin-bottom: 8px;
-    }
-
-    .balance-amount {
-      font-family: 'Space Mono', monospace;
-      font-size: 48px;
-      font-weight: 700;
-      letter-spacing: -2px;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .balance-amount .currency {
-      font-size: 28px;
-      color: var(--text-secondary);
-      vertical-align: top;
-      margin-right: 4px;
-    }
-
-    .balance-amount .cents {
-      font-size: 24px;
-      color: var(--text-secondary);
-    }
-
-    .balance-stats {
-      display: flex;
-      gap: 24px;
-    }
-
-    .stat {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stat-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-
-    .stat-icon.interest {
-      background: var(--accent-green-dim);
-      color: var(--accent-green);
-    }
-
-    .stat-icon.spent {
-      background: var(--accent-coral-dim);
-      color: var(--accent-coral);
-    }
-
-    .stat-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .stat-value {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    /* Interest Progress */
-    .interest-section {
-      background: var(--bg-card);
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border-subtle);
-    }
-
-    .interest-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .interest-title {
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .interest-title svg {
-      color: var(--accent-gold);
-    }
-
-    .interest-rate {
-      font-size: 13px;
-      color: var(--accent-green);
-      font-weight: 600;
-      background: var(--accent-green-dim);
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    .interest-progress {
-      height: 8px;
-      background: var(--bg-primary);
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-
-    .interest-progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent-green), var(--accent-gold));
-      border-radius: 10px;
-      transition: width 0.5s ease;
-    }
-
-    .interest-info {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .interest-info span:last-child {
-      color: var(--accent-green);
-      font-weight: 500;
-    }
-
-    /* Transactions */
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    .view-all {
-      font-size: 13px;
-      color: var(--accent-green);
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .transactions-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .transaction {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      background: var(--bg-card);
-      border-radius: 16px;
-      border: 1px solid var(--border-subtle);
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-
-    .transaction:hover {
-      background: var(--bg-card-hover);
-      transform: translateX(4px);
-    }
-
-    .transaction-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .transaction-icon.deposit {
-      background: var(--accent-green-dim);
-      color: var(--accent-green);
-    }
-
-    .transaction-icon.withdrawal {
-      background: var(--accent-coral-dim);
-      color: var(--accent-coral);
-    }
-
-    .transaction-icon.interest {
-      background: linear-gradient(135deg, rgba(255, 217, 61, 0.15), rgba(168, 85, 247, 0.15));
-      color: var(--accent-gold);
-    }
-
-    .transaction-details {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .transaction-title {
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .transaction-date {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    .transaction-amount {
-      font-family: 'Space Mono', monospace;
-      font-size: 15px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .transaction-amount.positive {
-      color: var(--accent-green);
-    }
-
-    .transaction-amount.negative {
-      color: var(--accent-coral);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-secondary);
-    }
-
-    .empty-state svg {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 16px;
-      opacity: 0.4;
-    }
-
-    .empty-state p {
-      font-size: 14px;
-    }
-
-    /* Bottom Actions */
-    .bottom-actions {
-      position: fixed;
-      bottom: 0;
       left: 0;
       right: 0;
-      padding: 16px 24px;
-      padding-bottom: max(16px, env(safe-area-inset-bottom));
-      background: linear-gradient(to top, var(--bg-primary) 60%, transparent);
-      display: flex;
-      gap: 12px;
-      max-width: 600px;
-      margin: 0 auto;
-      z-index: 100;
-    }
-
-    .action-btn {
-      flex: 1;
-      padding: 16px 20px;
-      border-radius: 16px;
-      border: none;
-      font-family: 'Outfit', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-
-    .action-btn.primary {
-      background: linear-gradient(135deg, var(--accent-green), #00b894);
-      color: var(--bg-primary);
-      box-shadow: 0 4px 20px rgba(0, 217, 165, 0.3);
-    }
-
-    .action-btn.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 30px rgba(0, 217, 165, 0.4);
-    }
-
-    .action-btn.secondary {
-      background: var(--bg-card);
-      color: var(--accent-coral);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .action-btn.secondary:hover {
-      background: var(--bg-card-hover);
-    }
-
-    .action-btn.allowance {
-      background: linear-gradient(135deg, var(--accent-gold), #f0b429);
-      color: var(--bg-primary);
-      box-shadow: 0 4px 20px rgba(255, 217, 61, 0.3);
-      flex: 1.2;
-    }
-
-    .action-btn.allowance:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 30px rgba(255, 217, 61, 0.4);
-    }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      z-index: 200;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .modal {
-      background: var(--bg-secondary);
-      border-radius: 24px 24px 0 0;
-      padding: 24px;
-      padding-bottom: max(24px, env(safe-area-inset-bottom));
-      width: 100%;
-      max-width: 600px;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
-    }
-
-    .modal-overlay.active .modal {
-      transform: translateY(0);
-    }
-
-    .modal-handle {
-      width: 40px;
       height: 4px;
-      background: var(--text-dim);
-      border-radius: 2px;
-      margin: 0 auto 20px;
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
-
-    .modal-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      text-align: center;
+    
+    .tile:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
     }
-
-    .form-group {
-      margin-bottom: 20px;
+    
+    .tile:active {
+      transform: translateY(0) scale(0.98);
     }
-
-    .form-label {
-      display: block;
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-family: 'Outfit', sans-serif;
-      font-size: 16px;
-      outline: none;
-      transition: all 0.2s ease;
-    }
-
-    .form-input:focus {
-      border-color: var(--accent-green);
-      box-shadow: 0 0 0 3px var(--accent-green-dim);
-    }
-
-    .form-input.amount {
-      font-family: 'Space Mono', monospace;
-      font-size: 28px;
-      font-weight: 700;
-      text-align: center;
-      padding: 24px;
-    }
-
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-    }
-
-    .modal-btn {
-      flex: 1;
-      padding: 16px;
-      border-radius: 14px;
-      border: none;
-      font-family: 'Outfit', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .modal-btn.cancel {
-      background: var(--bg-card);
-      color: var(--text-secondary);
-    }
-
-    .modal-btn.confirm {
-      background: var(--accent-green);
-      color: var(--bg-primary);
-    }
-
-    .modal-btn.confirm.withdrawal {
-      background: var(--accent-coral);
-    }
-
-    /* Settings Modal */
-    .settings-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .settings-item:last-child {
-      border-bottom: none;
-    }
-
-    .settings-label {
-      font-size: 15px;
-      font-weight: 500;
-    }
-
-    .settings-sublabel {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 2px;
-    }
-
-    .settings-value {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .settings-input {
-      width: 80px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      font-family: 'Space Mono', monospace;
-      font-size: 14px;
-      text-align: right;
-      outline: none;
-    }
-
-    .danger-btn {
-      background: var(--accent-coral-dim);
-      color: var(--accent-coral);
-      padding: 12px 20px;
-      border-radius: 12px;
-      border: none;
-      font-family: 'Outfit', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* Animations */
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .animate-in {
-      animation: slideUp 0.4s ease forwards;
-    }
-
-    .delay-1 { animation-delay: 0.1s; opacity: 0; }
-    .delay-2 { animation-delay: 0.2s; opacity: 0; }
-    .delay-3 { animation-delay: 0.3s; opacity: 0; }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--bg-card);
-      color: var(--text-primary);
-      padding: 14px 24px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 500;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    
+    /* Wallet Tile */
+    .tile-wallet {
+      animation: slideUp 0.5s ease 0.4s forwards;
       opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      z-index: 300;
+    }
+    
+    .tile-wallet::before {
+      background: var(--gradient-green);
+    }
+    
+    .tile-wallet:hover {
+      border-color: var(--accent-green);
+      box-shadow: var(--shadow-glow-green);
+    }
+    
+    .tile-wallet .tile-icon {
+      background: rgba(0, 214, 125, 0.15);
+      color: var(--accent-green);
+    }
+    
+    /* Goals Tile */
+    .tile-goals {
+      animation: slideUp 0.5s ease 0.5s forwards;
+      opacity: 0;
+    }
+    
+    .tile-goals::before {
+      background: var(--gradient-gold);
+    }
+    
+    .tile-goals:hover {
+      border-color: var(--accent-gold);
+      box-shadow: var(--shadow-glow-gold);
+    }
+    
+    .tile-goals .tile-icon {
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--accent-gold);
+    }
+    
+    /* Tile Content */
+    .tile-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      margin-bottom: var(--space-md);
     }
-
-    .toast.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
+    
+    .tile-icon svg {
+      width: 28px;
+      height: 28px;
     }
-
-    .toast.success {
-      border-left: 3px solid var(--accent-green);
+    
+    .tile-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
     }
-
-    .toast.error {
-      border-left: 3px solid var(--accent-coral);
+    
+    .tile-desc {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      flex-grow: 1;
     }
-
-    /* Confetti */
-    .confetti {
-      position: fixed;
-      pointer-events: none;
-      z-index: 400;
+    
+    .tile-stat {
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    
+    .tile-stat strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+      animation: slideUp 0.5s ease 0.6s forwards;
+      opacity: 0;
+    }
+    
+    .quick-actions-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-md);
+    }
+    
+    .quick-actions-grid {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .quick-action {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+    
+    .quick-action:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .quick-action svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .quick-action-add {
+      color: var(--accent-green);
+    }
+    
+    .quick-action-add:hover {
+      border-color: var(--accent-green);
+      box-shadow: 0 0 20px var(--accent-green-glow);
+    }
+    
+    /* Loading state */
+    .balance-amount.loading {
+      background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-card) 50%, var(--bg-elevated) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      -webkit-background-clip: text;
+      color: transparent;
     }
   </style>
 </head>
 <body>
-  <div class="bg-gradient"></div>
-  
   <div class="app">
-    <header>
-      <div class="header-top">
-        <div>
-          <p class="greeting" id="greeting">Good morning!</p>
-          <h1 class="app-title">MY WALLET</h1>
-        </div>
-        <button class="settings-btn" onclick="openSettings()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-        </button>
+    <!-- Header -->
+    <header class="home-header">
+      <div class="home-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+          <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+          <path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/>
+        </svg>
       </div>
+      <h1 class="home-title">KidsWallet</h1>
+      <p class="home-subtitle">Your money, your goals</p>
     </header>
-
-    <main>
-      <div class="balance-card animate-in">
-        <p class="balance-label">Total Balance</p>
-        <p class="balance-amount">
-          <span class="currency">$</span><span id="balanceDollars">0</span><span class="cents">.<span id="balanceCents">00</span></span>
-        </p>
-        <div class="balance-stats">
-          <div class="stat">
-            <div class="stat-icon interest">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-              </svg>
-            </div>
-            <div class="stat-info">
-              <span class="stat-label">Interest Earned</span>
-              <span class="stat-value" id="totalInterest">$0.00</span>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-icon spent">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 19V5M5 12l7-7 7 7"/>
-              </svg>
-            </div>
-            <div class="stat-info">
-              <span class="stat-label">Total Spent</span>
-              <span class="stat-value" id="totalSpent">$0.00</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="interest-section animate-in delay-1">
-        <div class="interest-header">
-          <span class="interest-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-            </svg>
-            Next Interest
-          </span>
-          <span class="interest-rate" id="interestRateDisplay">5% monthly</span>
-        </div>
-        <div class="interest-progress">
-          <div class="interest-progress-bar" id="interestProgressBar" style="width: 0%"></div>
-        </div>
-        <div class="interest-info">
-          <span id="daysUntilInterest">Loading...</span>
-          <span id="nextInterestAmount">+$0.00 on 1st</span>
-        </div>
-      </div>
-
-      <div class="animate-in delay-2">
-        <div class="section-header">
-          <h2 class="section-title">Recent Activity</h2>
-        </div>
-        <div class="transactions-list" id="transactionsList">
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="2" y="4" width="20" height="16" rx="2"/>
-              <path d="M2 10h20"/>
-            </svg>
-            <p>No transactions yet.<br>Add your first deposit to get started!</p>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <div class="bottom-actions animate-in delay-3">
-      <button class="action-btn secondary" onclick="openModal('withdrawal')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-        Spend
-      </button>
-      <button class="action-btn allowance" onclick="claimAllowance()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
-        I Earned It!
-      </button>
-      <button class="action-btn primary" onclick="openModal('deposit')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 5v14M5 12h14"/>
-        </svg>
-        Add
-      </button>
+    
+    <!-- Balance Preview -->
+    <div class="balance-preview">
+      <p class="balance-label">Total Balance</p>
+      <p class="balance-amount loading" id="totalBalance">$0.00</p>
     </div>
-  </div>
-
-  <!-- Transaction Modal -->
-  <div class="modal-overlay" id="transactionModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h2 class="modal-title" id="modalTitle">Add Money</h2>
-      <div class="form-group">
-        <label class="form-label">Amount</label>
-        <input type="number" class="form-input amount" id="amountInput" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
-      </div>
-      <div class="form-group">
-        <label class="form-label">What's it for?</label>
-        <input type="text" class="form-input" id="descriptionInput" placeholder="e.g., Allowance, Birthday gift...">
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-        <button class="modal-btn confirm" id="confirmBtn" onclick="confirmTransaction()">Add</button>
+    
+    <!-- Tiles -->
+    <div class="tiles-grid">
+      <!-- Wallet Tile -->
+      <a href="wallet.html" class="tile tile-wallet">
+        <div class="tile-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/>
+          </svg>
+        </div>
+        <h2 class="tile-title">My Wallet</h2>
+        <p class="tile-desc">Track spending and deposits</p>
+        <div class="tile-stat">
+          <span id="walletStat">Loading...</span>
+        </div>
+      </a>
+      
+      <!-- Goals Tile -->
+      <a href="goals.html" class="tile tile-goals">
+        <div class="tile-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="6"/>
+            <circle cx="12" cy="12" r="2"/>
+          </svg>
+        </div>
+        <h2 class="tile-title">My Goals</h2>
+        <p class="tile-desc">Save for things you want</p>
+        <div class="tile-stat">
+          <span id="goalsStat">Loading...</span>
+        </div>
+      </a>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <p class="quick-actions-title">Quick Actions</p>
+      <div class="quick-actions-grid">
+        <a href="wallet.html?action=deposit" class="quick-action quick-action-add">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v8M8 12h8"/>
+          </svg>
+          Add Money
+        </a>
+        <a href="goals.html?action=new" class="quick-action">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+          </svg>
+          New Goal
+        </a>
       </div>
     </div>
   </div>
-
-  <!-- Settings Modal -->
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h2 class="modal-title">Settings</h2>
-      
-      <div class="settings-item">
-        <div>
-          <p class="settings-label">Allowance Amount</p>
-          <p class="settings-sublabel">Amount earned for completing chores</p>
-        </div>
-        <div class="settings-value">
-          <span>$</span>
-          <input type="number" class="settings-input" id="allowanceAmountInput" value="5" min="0" max="1000" step="0.50">
-        </div>
-      </div>
-      
-      <div class="settings-item">
-        <div>
-          <p class="settings-label">Monthly Interest Rate</p>
-          <p class="settings-sublabel">Compounds on the 1st of each month</p>
-        </div>
-        <div class="settings-value">
-          <input type="number" class="settings-input" id="interestRateInput" value="5" min="0" max="100" step="0.5">
-          <span>%</span>
-        </div>
-      </div>
-      
-      <div class="settings-item">
-        <div>
-          <p class="settings-label">Parent PIN</p>
-          <p class="settings-sublabel">Required to reset or change settings</p>
-        </div>
-        <div class="settings-value">
-          <input type="password" class="settings-input" id="parentPinInput" placeholder="••••" maxlength="6" style="width: 80px; text-align: center;">
-        </div>
-      </div>
-      
-      <div class="settings-item">
-        <div>
-          <p class="settings-label">Reset Everything</p>
-          <p class="settings-sublabel">Clear all data (requires PIN)</p>
-        </div>
-        <button class="danger-btn" onclick="confirmReset()">Reset</button>
-      </div>
-
-      <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="closeSettings()">Close</button>
-        <button class="modal-btn confirm" onclick="saveSettings()">Save Changes</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PIN Entry Modal -->
-  <div class="modal-overlay" id="pinModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h2 class="modal-title">Enter Parent PIN</h2>
-      <div class="form-group">
-        <label class="form-label">PIN</label>
-        <input type="password" class="form-input amount" id="pinInput" placeholder="••••" maxlength="6" inputmode="numeric" style="font-size: 24px; letter-spacing: 8px;">
-      </div>
-      <div class="modal-actions">
-        <button class="modal-btn cancel" onclick="closePinModal()">Cancel</button>
-        <button class="modal-btn confirm" id="pinConfirmBtn" onclick="verifyPin()">Confirm</button>
-      </div>
-    </div>
-  </div>
-
+  
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    // Firebase imports
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc, 
-      onSnapshot,
-      collection,
-      addDoc,
-      query,
-      orderBy,
-      limit,
-      getDocs,
-      deleteDoc,
-      writeBatch,
-      serverTimestamp
-    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-    // Firebase config imported from external file
-    import { firebaseConfig } from './firebase-config.js';
-
-    // Check if Firebase is configured
-    const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+      getWalletData, 
+      subscribeToWallet,
+      subscribeToGoals,
+      formatCurrency,
+      getLocalData
+    } from './shared.js';
     
-    let db = null;
-    let unsubscribeWallet = null;
-    let unsubscribeTransactions = null;
-
-    if (isFirebaseConfigured) {
-      try {
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        console.log('Firebase initialized');
-      } catch (e) {
-        console.log('Firebase init failed, using localStorage', e);
-      }
-    } else {
-      console.log('Firebase not configured, using localStorage only');
-    }
-
-    // App State
-    let state = {
-      balance: 0,
-      totalInterest: 0,
-      totalSpent: 0,
-      totalDeposits: 0,
-      transactions: [],
-      settings: {
-        interestRate: 5,              // Monthly interest rate
-        lastInterestMonth: null,      // Track last month interest was paid (e.g., "2024-02")
-        allowanceAmount: 5,           // Allowance amount when earned
-        parentPin: null               // PIN required for reset and settings changes
-      }
-    };
-
-    // Wallet ID - you can change this to support multiple kids
-    const WALLET_ID = 'main_wallet';
-
-    // Load/Save State with proper Firestore collections
-    async function loadState() {
-      if (db) {
-        try {
-          // Load wallet data
-          const walletRef = doc(db, 'wallets', WALLET_ID);
-          const walletSnap = await getDoc(walletRef);
-          
-          if (walletSnap.exists()) {
-            const walletData = walletSnap.data();
-            state.balance = walletData.balance || 0;
-            state.totalInterest = walletData.totalInterest || 0;
-            state.totalSpent = walletData.totalSpent || 0;
-            state.totalDeposits = walletData.totalDeposits || 0;
-            state.settings = walletData.settings || state.settings;
-          }
-
-          // Load transactions from subcollection
-          const transactionsRef = collection(db, 'wallets', WALLET_ID, 'transactions');
-          const transactionsQuery = query(transactionsRef, orderBy('date', 'desc'), limit(50));
-          const transactionsSnap = await getDocs(transactionsQuery);
-          
-          state.transactions = [];
-          transactionsSnap.forEach(doc => {
-            state.transactions.push({ id: doc.id, ...doc.data() });
-          });
-
-          // Set up real-time listener for wallet
-          unsubscribeWallet = onSnapshot(walletRef, (doc) => {
-            if (doc.exists()) {
-              const walletData = doc.data();
-              state.balance = walletData.balance || 0;
-              state.totalInterest = walletData.totalInterest || 0;
-              state.totalSpent = walletData.totalSpent || 0;
-              state.totalDeposits = walletData.totalDeposits || 0;
-              state.settings = walletData.settings || state.settings;
-              updateUI();
-            }
-          });
-
-          // Set up real-time listener for transactions
-          unsubscribeTransactions = onSnapshot(transactionsQuery, (snapshot) => {
-            state.transactions = [];
-            snapshot.forEach(doc => {
-              state.transactions.push({ id: doc.id, ...doc.data() });
-            });
-            updateTransactions();
-          });
-
-          console.log('Loaded from Firestore');
-        } catch (e) {
-          console.log('Firebase load failed, using localStorage', e);
-          loadFromLocalStorage();
-        }
-      } else {
-        loadFromLocalStorage();
-      }
-      
-      checkInterest();
-      updateUI();
-    }
-
-    function loadFromLocalStorage() {
-      const saved = localStorage.getItem('walletState');
-      if (saved) {
-        state = { ...state, ...JSON.parse(saved) };
-      }
-    }
-
-    // Save wallet summary to Firestore
-    async function saveWallet() {
-      // Save to localStorage always (offline support)
-      localStorage.setItem('walletState', JSON.stringify(state));
-      
-      if (db) {
-        try {
-          const walletRef = doc(db, 'wallets', WALLET_ID);
-          await setDoc(walletRef, {
-            balance: state.balance,
-            totalInterest: state.totalInterest,
-            totalSpent: state.totalSpent,
-            totalDeposits: state.totalDeposits,
-            settings: state.settings,
-            lastUpdated: serverTimestamp()
-          }, { merge: true });
-          console.log('Wallet saved to Firestore');
-        } catch (e) {
-          console.log('Firebase wallet save failed', e);
-        }
-      }
-    }
-
-    // Save a transaction to Firestore subcollection
-    async function saveTransaction(transaction) {
-      if (db) {
-        try {
-          const transactionsRef = collection(db, 'wallets', WALLET_ID, 'transactions');
-          const docRef = await addDoc(transactionsRef, {
-            type: transaction.type,
-            amount: transaction.amount,
-            description: transaction.description,
-            date: transaction.date,
-            createdAt: serverTimestamp()
-          });
-          console.log('Transaction saved with ID:', docRef.id);
-          return docRef.id;
-        } catch (e) {
-          console.log('Firebase transaction save failed', e);
-        }
-      }
-      return null;
-    }
-
-    // Delete all transactions (for reset)
-    async function deleteAllTransactions() {
-      if (db) {
-        try {
-          const transactionsRef = collection(db, 'wallets', WALLET_ID, 'transactions');
-          const snapshot = await getDocs(transactionsRef);
-          
-          const batch = writeBatch(db);
-          snapshot.forEach(doc => {
-            batch.delete(doc.ref);
-          });
-          await batch.commit();
-          console.log('All transactions deleted');
-        } catch (e) {
-          console.log('Failed to delete transactions', e);
-        }
-      }
-    }
-
-    // Check and apply monthly interest (compounds on the 1st of each month)
-    async function checkInterest() {
-      const now = new Date();
-      const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-      const dayOfMonth = now.getDate();
-      
-      // Only apply interest on the 1st of the month, and only once per month
-      if (dayOfMonth === 1 && 
-          state.settings.lastInterestMonth !== currentMonth &&
-          state.balance > 0) {
-        
-        const interestAmount = state.balance * (state.settings.interestRate / 100);
-        const roundedInterest = Math.round(interestAmount * 100) / 100;
-        
-        if (roundedInterest > 0) {
-          state.balance += roundedInterest;
-          state.totalInterest += roundedInterest;
-          state.settings.lastInterestMonth = currentMonth;
-          
-          const transaction = {
-            type: 'interest',
-            amount: roundedInterest,
-            description: `Monthly Interest (${state.settings.interestRate}%)`,
-            date: now.toISOString()
-          };
-          
-          // Save transaction to Firestore
-          await saveTransaction(transaction);
-          
-          // Add to local state for immediate UI update
-          state.transactions.unshift({ id: Date.now().toString(), ...transaction });
-          
-          await saveWallet();
-          showToast(`Interest added: +$${roundedInterest.toFixed(2)}! 🎉`, 'success');
-          createConfetti();
-        }
-      }
-    }
-
-    // Claim allowance - manual trigger when kid earns it
-    async function claimAllowance() {
-      const allowanceAmount = state.settings.allowanceAmount || 5;
-      const now = new Date();
-      
-      state.balance += allowanceAmount;
-      state.totalDeposits += allowanceAmount;
-      
-      const transaction = {
-        type: 'deposit',
-        amount: allowanceAmount,
-        description: 'Allowance Earned! ⭐',
-        date: now.toISOString()
-      };
-      
-      // Save transaction to Firestore
-      await saveTransaction(transaction);
-      
-      // Add to local state for immediate UI update
-      state.transactions.unshift({ id: Date.now().toString(), ...transaction });
-      
-      await saveWallet();
-      showToast(`Great job! You earned $${allowanceAmount.toFixed(2)}! 🌟`, 'success');
-      createConfetti();
-      updateUI();
-    }
+    // DOM Elements
+    const totalBalanceEl = document.getElementById('totalBalance');
+    const walletStatEl = document.getElementById('walletStat');
+    const goalsStatEl = document.getElementById('goalsStat');
     
-    // Make claimAllowance available globally
-    window.claimAllowance = claimAllowance;
-
-    // PIN verification
-    let pendingPinAction = null;
-
-    window.openPinModal = function(action) {
-      pendingPinAction = action;
-      document.getElementById('pinInput').value = '';
-      document.getElementById('pinModal').classList.add('active');
+    // Update Balance Display
+    function updateBalance(wallet) {
+      const balance = wallet?.balance || 0;
+      totalBalanceEl.textContent = formatCurrency(balance);
+      totalBalanceEl.classList.remove('loading');
+      
+      // Animate the number
+      totalBalanceEl.style.transform = 'scale(1.05)';
       setTimeout(() => {
-        document.getElementById('pinInput').focus();
-      }, 300);
-    };
-
-    window.closePinModal = function() {
-      document.getElementById('pinModal').classList.remove('active');
-      pendingPinAction = null;
-    };
-
-    window.verifyPin = function() {
-      const enteredPin = document.getElementById('pinInput').value;
-      const correctPin = state.settings.parentPin;
-      
-      if (!correctPin) {
-        showToast('No PIN set. Set one in settings first!', 'error');
-        closePinModal();
-        return;
-      }
-      
-      if (enteredPin === correctPin) {
-        // Save action before closing (closePinModal resets pendingPinAction)
-        const action = pendingPinAction;
-        closePinModal();
-        
-        if (action === 'reset') {
-          executeReset();
-        } else if (action === 'settings') {
-          showSettingsModal();
-        }
-      } else {
-        showToast('Incorrect PIN', 'error');
-        document.getElementById('pinInput').value = '';
-      }
-    };
-
-    // UI Update Functions
-    function updateUI() {
-      updateGreeting();
-      updateBalance();
-      updateStats();
-      updateInterestProgress();
-      updateTransactions();
+        totalBalanceEl.style.transform = 'scale(1)';
+      }, 150);
     }
-
-    function updateGreeting() {
-      const hour = new Date().getHours();
-      let greeting = 'Good evening!';
-      if (hour < 12) greeting = 'Good morning!';
-      else if (hour < 17) greeting = 'Good afternoon!';
-      document.getElementById('greeting').textContent = greeting;
-    }
-
-    function updateBalance() {
-      const dollars = Math.floor(state.balance);
-      const cents = Math.round((state.balance - dollars) * 100).toString().padStart(2, '0');
-      document.getElementById('balanceDollars').textContent = dollars.toLocaleString();
-      document.getElementById('balanceCents').textContent = cents;
-    }
-
-    function updateStats() {
-      document.getElementById('totalInterest').textContent = `$${state.totalInterest.toFixed(2)}`;
-      document.getElementById('totalSpent').textContent = `$${state.totalSpent.toFixed(2)}`;
-    }
-
-    function updateInterestProgress() {
-      const now = new Date();
-      
-      // Calculate days until 1st of next month (interest day)
-      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-      const daysUntilInterest = Math.ceil((nextMonth - now) / (1000 * 60 * 60 * 24));
-      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-      const daysPassed = now.getDate();
-      
-      const interestProgress = (daysPassed / daysInMonth) * 100;
-      const nextInterest = state.balance * (state.settings.interestRate / 100);
-      
-      document.getElementById('interestProgressBar').style.width = `${interestProgress}%`;
-      document.getElementById('interestRateDisplay').textContent = `${state.settings.interestRate}% monthly`;
-      document.getElementById('nextInterestAmount').textContent = `+$${nextInterest.toFixed(2)} on 1st`;
-      
-      // Show days until interest
-      const interestText = daysUntilInterest === 1 
-        ? '1 day until interest' 
-        : `${daysUntilInterest} days until interest`;
-      
-      document.getElementById('daysUntilInterest').textContent = interestText;
-    }
-
-    function updateTransactions() {
-      const list = document.getElementById('transactionsList');
-      
-      if (state.transactions.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="2" y="4" width="20" height="16" rx="2"/>
-              <path d="M2 10h20"/>
-            </svg>
-            <p>No transactions yet.<br>Add your first deposit to get started!</p>
-          </div>
-        `;
-        return;
-      }
-      
-      list.innerHTML = state.transactions.slice(0, 10).map(tx => {
-        const date = new Date(tx.date);
-        const dateStr = date.toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit'
-        });
-        
-        const iconClass = tx.type === 'deposit' ? 'deposit' : 
-                          tx.type === 'interest' ? 'interest' : 'withdrawal';
-        
-        const icon = tx.type === 'deposit' ? 
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
-          tx.type === 'interest' ?
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>' :
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
-        
-        const amountClass = tx.type === 'withdrawal' ? 'negative' : 'positive';
-        const amountPrefix = tx.type === 'withdrawal' ? '-' : '+';
-        
-        return `
-          <div class="transaction" data-id="${tx.id}">
-            <div class="transaction-icon ${iconClass}">${icon}</div>
-            <div class="transaction-details">
-              <p class="transaction-title">${tx.description}</p>
-              <p class="transaction-date">${dateStr}</p>
-            </div>
-            <span class="transaction-amount ${amountClass}">${amountPrefix}$${tx.amount.toFixed(2)}</span>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // Modal Functions
-    let currentModalType = 'deposit';
-
-    window.openModal = function(type) {
-      currentModalType = type;
-      const modal = document.getElementById('transactionModal');
-      const title = document.getElementById('modalTitle');
-      const confirmBtn = document.getElementById('confirmBtn');
-      const descInput = document.getElementById('descriptionInput');
-      
-      if (type === 'deposit') {
-        title.textContent = 'Add Money';
-        confirmBtn.textContent = 'Add';
-        confirmBtn.classList.remove('withdrawal');
-        descInput.placeholder = 'e.g., Allowance, Birthday gift...';
-      } else {
-        title.textContent = 'Spend Money';
-        confirmBtn.textContent = 'Spend';
-        confirmBtn.classList.add('withdrawal');
-        descInput.placeholder = 'e.g., Toy, Game, Candy...';
-      }
-      
-      document.getElementById('amountInput').value = '';
-      descInput.value = '';
-      modal.classList.add('active');
-      
-      setTimeout(() => {
-        document.getElementById('amountInput').focus();
-      }, 300);
-    };
-
-    window.closeModal = function() {
-      document.getElementById('transactionModal').classList.remove('active');
-    };
-
-    window.confirmTransaction = async function() {
-      const amount = parseFloat(document.getElementById('amountInput').value);
-      const description = document.getElementById('descriptionInput').value.trim() || 
-        (currentModalType === 'deposit' ? 'Deposit' : 'Purchase');
-      
-      if (!amount || amount <= 0) {
-        showToast('Please enter a valid amount', 'error');
-        return;
-      }
-      
-      if (currentModalType === 'withdrawal' && amount > state.balance) {
-        showToast("You don't have enough money!", 'error');
-        return;
-      }
-      
-      const transaction = {
-        type: currentModalType,
-        amount: Math.round(amount * 100) / 100,
-        description: description,
-        date: new Date().toISOString()
-      };
-      
-      // Update balance
-      if (currentModalType === 'deposit') {
-        state.balance += transaction.amount;
-        state.totalDeposits += transaction.amount;
-        showToast(`Added $${transaction.amount.toFixed(2)}!`, 'success');
-        createConfetti();
-      } else {
-        state.balance -= transaction.amount;
-        state.totalSpent += transaction.amount;
-        showToast(`Spent $${transaction.amount.toFixed(2)}`, 'success');
-      }
-      
-      // Save transaction to Firestore
-      const txId = await saveTransaction(transaction);
-      
-      // Add to local state for immediate UI update
-      state.transactions.unshift({ id: txId || Date.now().toString(), ...transaction });
-      
-      // Save wallet summary
-      await saveWallet();
-      
-      updateUI();
-      closeModal();
-    };
-
-    // Settings Functions
-    window.openSettings = function() {
-      // If PIN is set, require it to access settings
-      if (state.settings.parentPin) {
-        openPinModal('settings');
-      } else {
-        showSettingsModal();
-      }
-    };
     
-    function showSettingsModal() {
-      document.getElementById('interestRateInput').value = state.settings.interestRate || 5;
-      document.getElementById('allowanceAmountInput').value = state.settings.allowanceAmount || 5;
-      document.getElementById('parentPinInput').value = state.settings.parentPin || '';
-      
-      document.getElementById('settingsModal').classList.add('active');
-    }
-
-    window.closeSettings = function() {
-      document.getElementById('settingsModal').classList.remove('active');
-    };
-
-    window.saveSettings = async function() {
-      state.settings.interestRate = parseFloat(document.getElementById('interestRateInput').value) || 5;
-      state.settings.allowanceAmount = parseFloat(document.getElementById('allowanceAmountInput').value) || 5;
-      
-      // Save parent PIN
-      const newPin = document.getElementById('parentPinInput').value.trim();
-      if (newPin) {
-        state.settings.parentPin = newPin;
-      }
-      
-      await saveWallet();
-      updateUI();
-      closeSettings();
-      showToast('Settings saved!', 'success');
-    };
-
-    window.confirmReset = function() {
-      // Always require PIN for reset
-      if (state.settings.parentPin) {
-        openPinModal('reset');
+    // Update Wallet Stats
+    function updateWalletStats(wallet) {
+      const interestEarned = wallet?.totalInterest || 0;
+      if (interestEarned > 0) {
+        walletStatEl.innerHTML = `<strong>${formatCurrency(interestEarned)}</strong> interest earned`;
       } else {
-        showToast('Set a Parent PIN first to enable reset', 'error');
+        walletStatEl.textContent = 'Start earning interest!';
       }
-    };
+    }
     
-    async function executeReset() {
-      if (confirm('Are you sure you want to reset everything? This cannot be undone!')) {
-        // Preserve the PIN
-        const savedPin = state.settings.parentPin;
-        
-        // Reset state
-        state = {
-          balance: 0,
-          totalInterest: 0,
-          totalSpent: 0,
-          totalDeposits: 0,
-          transactions: [],
-          settings: {
-            interestRate: 5,
-            lastInterestMonth: null,
-            allowanceAmount: 5,
-            parentPin: savedPin  // Keep the PIN
-          }
-        };
-        
-        // Delete all transactions from Firestore
-        await deleteAllTransactions();
-        
-        // Save reset wallet
-        await saveWallet();
-        
-        updateUI();
-        closeSettings();
-        showToast('Everything has been reset', 'success');
+    // Update Goals Stats
+    function updateGoalsStats(goals) {
+      if (!goals || goals.length === 0) {
+        goalsStatEl.textContent = 'Set your first goal!';
+        return;
+      }
+      
+      const activeGoals = goals.filter(g => !g.completed);
+      const completedGoals = goals.filter(g => g.completed);
+      
+      if (activeGoals.length > 0) {
+        goalsStatEl.innerHTML = `<strong>${activeGoals.length}</strong> active goal${activeGoals.length > 1 ? 's' : ''}`;
+      } else if (completedGoals.length > 0) {
+        goalsStatEl.innerHTML = `<strong>${completedGoals.length}</strong> completed!`;
+      } else {
+        goalsStatEl.textContent = 'Set your first goal!';
       }
     }
-
-    // Toast
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = `toast ${type} show`;
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-
-    // Confetti Effect
-    function createConfetti() {
-      const colors = ['#00d9a5', '#ffd93d', '#a855f7', '#ff6b6b'];
-      for (let i = 0; i < 50; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.cssText = `
-          position: fixed;
-          width: ${Math.random() * 10 + 5}px;
-          height: ${Math.random() * 10 + 5}px;
-          background: ${colors[Math.floor(Math.random() * colors.length)]};
-          left: ${Math.random() * 100}vw;
-          top: -20px;
-          border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-          animation: confettiFall ${Math.random() * 2 + 2}s linear forwards;
-        `;
-        document.body.appendChild(confetti);
-        setTimeout(() => confetti.remove(), 4000);
-      }
-    }
-
-    // Add confetti animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes confettiFall {
-        to {
-          transform: translateY(100vh) rotate(720deg);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Close modals on backdrop click
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-          overlay.classList.remove('active');
-        }
-      });
-    });
-
+    
     // Initialize
-    loadState();
-
+    async function init() {
+      // Subscribe to wallet updates
+      subscribeToWallet((wallet) => {
+        updateBalance(wallet);
+        updateWalletStats(wallet);
+      });
+      
+      // Subscribe to goals updates
+      subscribeToGoals((goals) => {
+        updateGoalsStats(goals);
+      });
+      
+      // Fallback - load from localStorage if subscriptions don't fire
+      setTimeout(async () => {
+        if (totalBalanceEl.classList.contains('loading')) {
+          const wallet = await getWalletData();
+          updateBalance(wallet);
+          updateWalletStats(wallet);
+        }
+        
+        const goals = getLocalData('goals', []);
+        updateGoalsStats(goals);
+      }, 1000);
+    }
+    
+    // Start
+    init();
+    
     // Register Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker registered'))
-        .catch(err => console.log('Service Worker registration failed:', err));
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.log('SW registration failed:', err));
     }
   </script>
 </body>
