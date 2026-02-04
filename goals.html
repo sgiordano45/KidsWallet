@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0a0a0f">
+  <meta name="theme-color" content="#f0f7ff">
   <title>My Goals - KidsWallet</title>
   
   <link rel="manifest" href="manifest.json">
@@ -24,7 +24,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(0, 184, 169, 0.1);
+      box-shadow: var(--shadow-sm);
     }
     
     .balance-preview-label {
@@ -36,7 +37,7 @@
       font-family: var(--font-display);
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--accent-green);
+      color: var(--accent-primary);
     }
     
     /* Add Goal Button */
@@ -45,10 +46,10 @@
       padding: var(--space-lg);
       margin-bottom: var(--space-xl);
       background: var(--bg-card);
-      border: 2px dashed rgba(255, 215, 0, 0.3);
+      border: 2px dashed rgba(245, 158, 11, 0.4);
       border-radius: var(--radius-xl);
       color: var(--accent-gold);
-      font-family: var(--font-body);
+      font-family: var(--font-display);
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
@@ -60,7 +61,7 @@
     }
     
     .add-goal-btn:hover {
-      background: rgba(255, 215, 0, 0.1);
+      background: rgba(245, 158, 11, 0.1);
       border-color: var(--accent-gold);
       box-shadow: var(--shadow-glow-gold);
     }
@@ -86,10 +87,11 @@
       background: var(--bg-card);
       border-radius: var(--radius-xl);
       padding: var(--space-lg);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(0, 184, 169, 0.1);
       transition: all var(--transition-normal);
       position: relative;
       overflow: hidden;
+      box-shadow: var(--shadow-card);
     }
     
     .goal-card::before {
@@ -104,7 +106,7 @@
     }
     
     .goal-card:hover {
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(245, 158, 11, 0.2);
       transform: translateY(-2px);
     }
     
@@ -133,7 +135,7 @@
       width: 48px;
       height: 48px;
       border-radius: var(--radius-lg);
-      background: rgba(255, 215, 0, 0.15);
+      background: rgba(245, 158, 11, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -141,11 +143,11 @@
     }
     
     .goal-card.completed .goal-icon {
-      background: rgba(0, 214, 125, 0.15);
+      background: rgba(52, 211, 153, 0.15);
     }
     
     .goal-card.achievable .goal-icon {
-      background: rgba(0, 214, 125, 0.15);
+      background: rgba(52, 211, 153, 0.15);
       animation: pulse 2s infinite;
     }
     
@@ -158,7 +160,7 @@
       width: 36px;
       height: 36px;
       border-radius: var(--radius-sm);
-      background: var(--bg-secondary);
+      background: var(--bg-elevated);
       border: none;
       color: var(--text-muted);
       cursor: pointer;
@@ -169,7 +171,7 @@
     }
     
     .goal-action-btn:hover {
-      background: var(--bg-elevated);
+      background: var(--bg-secondary);
       color: var(--text-primary);
     }
     
@@ -223,7 +225,7 @@
     
     .progress-bar {
       height: 12px;
-      background: var(--bg-secondary);
+      background: var(--bg-elevated);
       border-radius: 6px;
       overflow: hidden;
       position: relative;
@@ -277,127 +279,89 @@
       align-items: center;
       gap: var(--space-sm);
       padding: var(--space-sm) var(--space-md);
-      background: rgba(0, 214, 125, 0.1);
+      background: rgba(52, 211, 153, 0.1);
       border-radius: var(--radius-sm);
       margin-top: var(--space-md);
+      color: var(--accent-green);
+      font-weight: 600;
+      font-size: 0.875rem;
     }
     
     .goal-status-icon {
-      color: var(--accent-green);
-    }
-    
-    .goal-status-text {
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--accent-green);
+      flex-shrink: 0;
     }
     
     /* Completed Badge */
     .completed-badge {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: var(--space-xs);
-      padding: var(--space-xs) var(--space-sm);
-      background: var(--accent-green);
-      color: #000;
-      font-size: 0.75rem;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: rgba(52, 211, 153, 0.1);
+      border-radius: var(--radius-md);
+      color: var(--accent-green);
+      font-family: var(--font-display);
       font-weight: 700;
-      border-radius: var(--radius-sm);
-      margin-top: var(--space-md);
     }
     
     .completed-badge svg {
-      width: 14px;
-      height: 14px;
+      width: 20px;
+      height: 20px;
     }
     
     /* Emoji Picker */
     .emoji-picker {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      display: flex;
+      flex-wrap: wrap;
       gap: var(--space-sm);
       margin-bottom: var(--space-md);
     }
     
     .emoji-btn {
-      aspect-ratio: 1;
+      width: 48px;
+      height: 48px;
       border-radius: var(--radius-md);
-      background: var(--bg-secondary);
+      background: var(--bg-elevated);
       border: 2px solid transparent;
       font-size: 1.5rem;
       cursor: pointer;
       transition: all var(--transition-fast);
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     
     .emoji-btn:hover {
-      background: var(--bg-elevated);
+      background: var(--bg-card);
       transform: scale(1.1);
     }
     
     .emoji-btn.selected {
-      border-color: var(--accent-gold);
-      background: rgba(255, 215, 0, 0.1);
+      border-color: var(--accent-primary);
+      background: rgba(0, 184, 169, 0.1);
     }
     
-    /* Section Headers */
-    .section-header {
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: var(--space-md);
+      justify-content: center;
+      z-index: 9999;
     }
     
-    .section-title {
-      font-family: var(--font-display);
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-    }
-    
-    .goals-count {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-    
-    /* Tabs */
-    .tabs {
-      display: flex;
-      gap: var(--space-sm);
-      margin-bottom: var(--space-lg);
-      background: var(--bg-card);
-      padding: var(--space-xs);
-      border-radius: var(--radius-lg);
-    }
-    
-    .tab {
-      flex: 1;
-      padding: var(--space-sm) var(--space-md);
-      background: none;
-      border: none;
-      border-radius: var(--radius-md);
-      color: var(--text-muted);
-      font-family: var(--font-body);
-      font-size: 0.875rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-    
-    .tab:hover {
-      color: var(--text-secondary);
-    }
-    
-    .tab.active {
-      background: var(--bg-elevated);
-      color: var(--text-primary);
+    .loading-overlay.hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="app" id="mainApp" style="display: none;">
     <!-- Header -->
     <header class="header">
       <a href="index.html" class="header-back">
@@ -407,18 +371,18 @@
         Home
       </a>
       <h1 class="header-title">My Goals</h1>
-      <div style="width: 60px;"></div>
+      <div class="header-actions"></div>
     </header>
     
     <!-- Balance Preview -->
-    <div class="balance-preview animate-slide-up">
+    <div class="balance-preview">
       <span class="balance-preview-label">Available to save</span>
       <span class="balance-preview-amount" id="availableBalance">$0.00</span>
     </div>
     
     <!-- Add Goal Button -->
     <button class="add-goal-btn" onclick="openAddGoalModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <path d="M12 8v8M8 12h8"/>
       </svg>
@@ -433,11 +397,7 @@
     
     <!-- Goals List -->
     <div class="goals-list" id="goalsList">
-      <div class="empty-state">
-        <div class="empty-state-icon">🎯</div>
-        <p class="empty-state-title">No goals yet</p>
-        <p class="empty-state-text">What are you saving for?</p>
-      </div>
+      <!-- Goals loaded dynamically -->
     </div>
   </div>
   
@@ -448,20 +408,20 @@
       <h2 class="modal-title" id="goalModalTitle">New Goal</h2>
       
       <div class="form-group">
-        <label class="form-label">Pick an icon</label>
+        <label class="form-label">Pick an emoji</label>
         <div class="emoji-picker" id="emojiPicker">
-          <button type="button" class="emoji-btn selected" data-emoji="🎮">🎮</button>
-          <button type="button" class="emoji-btn" data-emoji="🚲">🚲</button>
-          <button type="button" class="emoji-btn" data-emoji="📱">📱</button>
-          <button type="button" class="emoji-btn" data-emoji="🎧">🎧</button>
-          <button type="button" class="emoji-btn" data-emoji="⚽">⚽</button>
-          <button type="button" class="emoji-btn" data-emoji="🎨">🎨</button>
-          <button type="button" class="emoji-btn" data-emoji="📚">📚</button>
-          <button type="button" class="emoji-btn" data-emoji="🎸">🎸</button>
-          <button type="button" class="emoji-btn" data-emoji="🛹">🛹</button>
-          <button type="button" class="emoji-btn" data-emoji="🎁">🎁</button>
-          <button type="button" class="emoji-btn" data-emoji="✈️">✈️</button>
-          <button type="button" class="emoji-btn" data-emoji="⭐">⭐</button>
+          <button class="emoji-btn selected" data-emoji="🎮">🎮</button>
+          <button class="emoji-btn" data-emoji="🚲">🚲</button>
+          <button class="emoji-btn" data-emoji="📱">📱</button>
+          <button class="emoji-btn" data-emoji="🎧">🎧</button>
+          <button class="emoji-btn" data-emoji="⚽">⚽</button>
+          <button class="emoji-btn" data-emoji="🎨">🎨</button>
+          <button class="emoji-btn" data-emoji="📚">📚</button>
+          <button class="emoji-btn" data-emoji="🎸">🎸</button>
+          <button class="emoji-btn" data-emoji="🎁">🎁</button>
+          <button class="emoji-btn" data-emoji="✈️">✈️</button>
+          <button class="emoji-btn" data-emoji="🐶">🐶</button>
+          <button class="emoji-btn" data-emoji="🌟">🌟</button>
         </div>
       </div>
       
@@ -477,7 +437,7 @@
       
       <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeGoalModal()">Cancel</button>
-        <button class="btn btn-primary" id="saveGoalBtn" onclick="saveGoal()">Save Goal</button>
+        <button class="btn btn-gold" id="saveGoalBtn" onclick="saveGoal()">Save Goal</button>
       </div>
     </div>
   </div>
@@ -487,6 +447,7 @@
 
   <script type="module">
     import {
+      onAuthChange,
       getWalletData,
       subscribeToWallet,
       subscribeToGoals,
@@ -506,8 +467,21 @@
     let editingGoalId = null;
     
     // DOM Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const mainApp = document.getElementById('mainApp');
     const availableBalanceEl = document.getElementById('availableBalance');
     const goalsListEl = document.getElementById('goalsList');
+    
+    // Auth check
+    onAuthChange((user) => {
+      if (user) {
+        loadingOverlay.classList.add('hidden');
+        mainApp.style.display = 'block';
+        init();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
     
     // Update Balance Display
     function updateBalance() {
@@ -668,7 +642,6 @@
       
       closeGoalModal();
       
-      // Refresh goals from local storage
       goals = getLocalData('goals', []);
       renderGoals();
     };
@@ -685,7 +658,6 @@
         });
         showToast('Congratulations! 🎉', 'success');
         
-        // Refresh
         goals = getLocalData('goals', []);
         renderGoals();
       }
@@ -700,7 +672,6 @@
         await deleteGoal(goalId);
         showToast('Goal deleted', 'success');
         
-        // Refresh
         goals = getLocalData('goals', []);
         renderGoals();
       }
@@ -742,9 +713,6 @@
         setTimeout(() => openAddGoalModal(), 500);
       }
     }
-    
-    // Start
-    init();
   </script>
 </body>
 </html>

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0a0a0f">
+  <meta name="theme-color" content="#f0f7ff">
   <title>KidsWallet</title>
   
   <link rel="manifest" href="manifest.json">
@@ -24,19 +24,19 @@
       width: 80px;
       height: 80px;
       margin: 0 auto var(--space-lg);
-      background: var(--gradient-green);
+      background: var(--gradient-primary);
       border-radius: var(--radius-xl);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: var(--shadow-glow-green);
+      box-shadow: var(--shadow-glow-teal);
       animation: scaleIn 0.5s ease forwards;
     }
     
     .home-logo svg {
       width: 48px;
       height: 48px;
-      color: #000;
+      color: #fff;
     }
     
     .home-title {
@@ -44,7 +44,7 @@
       font-size: 2.5rem;
       font-weight: 700;
       margin-bottom: var(--space-sm);
-      background: linear-gradient(135deg, #fff 0%, #a0a0b0 100%);
+      background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -59,6 +59,14 @@
       opacity: 0;
     }
     
+    /* User Header */
+    .user-header {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: var(--space-md);
+      position: relative;
+    }
+    
     /* Balance Preview */
     .balance-preview {
       background: var(--bg-card);
@@ -66,7 +74,8 @@
       padding: var(--space-xl);
       margin-bottom: var(--space-xl);
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(0, 184, 169, 0.1);
+      box-shadow: var(--shadow-card);
       animation: slideUp 0.5s ease 0.3s forwards;
       opacity: 0;
     }
@@ -83,8 +92,9 @@
       font-family: var(--font-display);
       font-size: 3rem;
       font-weight: 700;
-      color: var(--accent-green);
-      text-shadow: 0 0 40px var(--accent-green-glow);
+      color: var(--accent-primary);
+      text-shadow: 0 0 40px var(--accent-primary-glow);
+      transition: transform var(--transition-fast);
     }
     
     /* Tiles Grid */
@@ -108,6 +118,7 @@
       min-height: 180px;
       display: flex;
       flex-direction: column;
+      box-shadow: var(--shadow-card);
     }
     
     .tile::before {
@@ -136,17 +147,17 @@
     }
     
     .tile-wallet::before {
-      background: var(--gradient-green);
+      background: var(--gradient-primary);
     }
     
     .tile-wallet:hover {
-      border-color: var(--accent-green);
-      box-shadow: var(--shadow-glow-green);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-glow-teal);
     }
     
     .tile-wallet .tile-icon {
-      background: rgba(0, 214, 125, 0.15);
-      color: var(--accent-green);
+      background: rgba(0, 184, 169, 0.15);
+      color: var(--accent-primary);
     }
     
     /* Goals Tile */
@@ -165,7 +176,7 @@
     }
     
     .tile-goals .tile-icon {
-      background: rgba(255, 215, 0, 0.15);
+      background: rgba(245, 158, 11, 0.15);
       color: var(--accent-gold);
     }
     
@@ -201,7 +212,7 @@
     .tile-stat {
       margin-top: var(--space-md);
       padding-top: var(--space-md);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
       font-size: 0.8rem;
       color: var(--text-muted);
     }
@@ -239,18 +250,19 @@
       padding: var(--space-md);
       background: var(--bg-card);
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(0, 184, 169, 0.1);
       color: var(--text-secondary);
       font-size: 0.875rem;
       font-weight: 600;
       text-decoration: none;
       transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
     }
     
     .quick-action:hover {
       background: var(--bg-elevated);
       color: var(--text-primary);
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(0, 184, 169, 0.2);
     }
     
     .quick-action svg {
@@ -259,12 +271,12 @@
     }
     
     .quick-action-add {
-      color: var(--accent-green);
+      color: var(--accent-primary);
     }
     
     .quick-action-add:hover {
-      border-color: var(--accent-green);
-      box-shadow: 0 0 20px var(--accent-green-glow);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-glow-teal);
     }
     
     /* Loading state */
@@ -278,7 +290,64 @@
   </style>
 </head>
 <body>
-  <div class="app">
+  <!-- Auth Screen -->
+  <div class="auth-overlay" id="authScreen">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+          <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+          <path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/>
+        </svg>
+      </div>
+      <h1 class="auth-title">KidsWallet</h1>
+      <p class="auth-subtitle">Sign in to manage your family's allowances</p>
+      
+      <div id="authContent">
+        <button class="google-btn" onclick="handleGoogleSignIn()">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="mainApp" style="display: none;">
+    <!-- User Header -->
+    <div class="user-header">
+      <div class="user-badge" id="userBadge" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <span id="userName">User</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m6 9 6 6 6-6"/>
+        </svg>
+      </div>
+      
+      <div class="user-menu" id="userMenu">
+        <a href="admin.html" class="user-menu-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          Parent Settings
+        </a>
+        <div class="user-menu-divider"></div>
+        <button class="user-menu-item danger" onclick="handleSignOut()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Sign Out
+        </button>
+      </div>
+    </div>
+    
     <!-- Header -->
     <header class="home-header">
       <div class="home-logo">
@@ -359,17 +428,147 @@
 
   <script type="module">
     import { 
+      onAuthChange,
+      signInWithGoogle,
+      signOutUser,
+      getCurrentUser,
       getWalletData, 
       subscribeToWallet,
       subscribeToGoals,
       formatCurrency,
-      getLocalData
+      getLocalData,
+      showToast
     } from './shared.js';
     
     // DOM Elements
+    const authScreen = document.getElementById('authScreen');
+    const mainApp = document.getElementById('mainApp');
+    const authContent = document.getElementById('authContent');
     const totalBalanceEl = document.getElementById('totalBalance');
     const walletStatEl = document.getElementById('walletStat');
     const goalsStatEl = document.getElementById('goalsStat');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+    const userMenu = document.getElementById('userMenu');
+    
+    let walletUnsubscribe = null;
+    let goalsUnsubscribe = null;
+    
+    // Auth handlers
+    window.handleGoogleSignIn = async function() {
+      authContent.innerHTML = `
+        <div class="auth-loading">
+          <div class="spinner"></div>
+          <p>Signing in...</p>
+        </div>
+      `;
+      
+      try {
+        await signInWithGoogle();
+      } catch (error) {
+        console.error('Sign in error:', error);
+        showToast('Sign in failed. Please try again.', 'error');
+        authContent.innerHTML = `
+          <button class="google-btn" onclick="handleGoogleSignIn()">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Sign in with Google
+          </button>
+        `;
+      }
+    };
+    
+    window.handleSignOut = async function() {
+      if (confirm('Sign out of KidsWallet?')) {
+        try {
+          // Cleanup subscriptions
+          if (walletUnsubscribe) walletUnsubscribe();
+          if (goalsUnsubscribe) goalsUnsubscribe();
+          
+          await signOutUser();
+          userMenu.classList.remove('active');
+        } catch (error) {
+          console.error('Sign out error:', error);
+          showToast('Sign out failed', 'error');
+        }
+      }
+    };
+    
+    window.toggleUserMenu = function() {
+      userMenu.classList.toggle('active');
+    };
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.user-badge') && !e.target.closest('.user-menu')) {
+        userMenu.classList.remove('active');
+      }
+    });
+    
+    // Update UI for authenticated user
+    function showAuthenticatedUI(user) {
+      authScreen.classList.add('hidden');
+      mainApp.style.display = 'block';
+      
+      // Update user info
+      if (user.photoURL) {
+        userAvatar.innerHTML = `<img src="${user.photoURL}" alt="${user.displayName}">`;
+      } else {
+        userAvatar.textContent = (user.displayName || user.email || '?').charAt(0).toUpperCase();
+      }
+      userName.textContent = user.displayName?.split(' ')[0] || 'User';
+      
+      // Start data subscriptions
+      startDataSubscriptions();
+    }
+    
+    function showUnauthenticatedUI() {
+      authScreen.classList.remove('hidden');
+      mainApp.style.display = 'none';
+      
+      // Reset auth content
+      authContent.innerHTML = `
+        <button class="google-btn" onclick="handleGoogleSignIn()">
+          <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Sign in with Google
+        </button>
+      `;
+    }
+    
+    // Data subscriptions
+    function startDataSubscriptions() {
+      // Subscribe to wallet updates
+      walletUnsubscribe = subscribeToWallet((wallet) => {
+        updateBalance(wallet);
+        updateWalletStats(wallet);
+      });
+      
+      // Subscribe to goals updates
+      goalsUnsubscribe = subscribeToGoals((goals) => {
+        updateGoalsStats(goals);
+      });
+      
+      // Fallback load
+      setTimeout(async () => {
+        if (totalBalanceEl.classList.contains('loading')) {
+          const wallet = await getWalletData();
+          updateBalance(wallet);
+          updateWalletStats(wallet);
+        }
+        
+        const goals = getLocalData('goals', []);
+        updateGoalsStats(goals);
+      }, 1000);
+    }
     
     // Update Balance Display
     function updateBalance(wallet) {
@@ -413,34 +612,14 @@
       }
     }
     
-    // Initialize
-    async function init() {
-      // Subscribe to wallet updates
-      subscribeToWallet((wallet) => {
-        updateBalance(wallet);
-        updateWalletStats(wallet);
-      });
-      
-      // Subscribe to goals updates
-      subscribeToGoals((goals) => {
-        updateGoalsStats(goals);
-      });
-      
-      // Fallback - load from localStorage if subscriptions don't fire
-      setTimeout(async () => {
-        if (totalBalanceEl.classList.contains('loading')) {
-          const wallet = await getWalletData();
-          updateBalance(wallet);
-          updateWalletStats(wallet);
-        }
-        
-        const goals = getLocalData('goals', []);
-        updateGoalsStats(goals);
-      }, 1000);
-    }
-    
-    // Start
-    init();
+    // Initialize - listen for auth changes
+    onAuthChange((user) => {
+      if (user) {
+        showAuthenticatedUI(user);
+      } else {
+        showUnauthenticatedUI();
+      }
+    });
     
     // Register Service Worker
     if ('serviceWorker' in navigator) {

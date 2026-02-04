@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0a0a0f">
+  <meta name="theme-color" content="#f0f7ff">
   <title>My Wallet - KidsWallet</title>
   
   <link rel="manifest" href="manifest.json">
@@ -17,14 +17,15 @@
     
     /* Balance Card */
     .balance-card {
-      background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%);
+      background: var(--card-teal);
       border-radius: var(--radius-xl);
       padding: var(--space-xl);
       margin-bottom: var(--space-lg);
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(0, 184, 169, 0.15);
       position: relative;
       overflow: hidden;
+      box-shadow: var(--shadow-card);
     }
     
     .balance-card::before {
@@ -34,7 +35,7 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle, var(--accent-green-glow) 0%, transparent 50%);
+      background: radial-gradient(circle, var(--accent-primary-glow) 0%, transparent 50%);
       opacity: 0.3;
       pointer-events: none;
     }
@@ -52,8 +53,8 @@
       font-family: var(--font-display);
       font-size: 3.5rem;
       font-weight: 700;
-      color: var(--accent-green);
-      text-shadow: 0 0 40px var(--accent-green-glow);
+      color: var(--accent-primary);
+      text-shadow: 0 0 40px var(--accent-primary-glow);
       position: relative;
       transition: all var(--transition-fast);
     }
@@ -75,7 +76,8 @@
       border-radius: var(--radius-lg);
       padding: var(--space-md);
       text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(0, 184, 169, 0.1);
+      box-shadow: var(--shadow-sm);
     }
     
     .stat-value {
@@ -107,14 +109,14 @@
     .action-btn-earned {
       width: 100%;
       margin-bottom: var(--space-xl);
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 180, 0, 0.1) 100%);
+      background: var(--card-gold);
       border: 2px solid var(--accent-gold);
       color: var(--accent-gold);
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
     }
     
     .action-btn-earned:hover {
-      background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 180, 0, 0.2) 100%);
+      background: rgba(245, 158, 11, 0.2);
       box-shadow: var(--shadow-glow-gold);
     }
     
@@ -126,7 +128,7 @@
       padding: var(--space-lg);
       border-radius: var(--radius-lg);
       border: none;
-      font-family: var(--font-body);
+      font-family: var(--font-display);
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
@@ -144,18 +146,18 @@
     
     .action-btn-deposit {
       background: var(--gradient-green);
-      color: #000;
+      color: #fff;
       box-shadow: var(--shadow-glow-green);
     }
     
     .action-btn-deposit:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.05);
     }
     
     .action-btn-withdraw {
       background: var(--bg-card);
       color: var(--text-primary);
-      border: 2px solid rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(0, 0, 0, 0.1);
     }
     
     .action-btn-withdraw:hover {
@@ -179,7 +181,7 @@
     
     .section-action {
       font-size: 0.875rem;
-      color: var(--accent-green);
+      color: var(--accent-primary);
       text-decoration: none;
       font-weight: 600;
     }
@@ -197,12 +199,14 @@
       background: var(--bg-card);
       padding: var(--space-md);
       border-radius: var(--radius-lg);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(0, 184, 169, 0.1);
       transition: all var(--transition-fast);
+      box-shadow: var(--shadow-sm);
     }
     
     .transaction:hover {
       background: var(--bg-elevated);
+      border-color: rgba(0, 184, 169, 0.2);
     }
     
     .transaction-icon {
@@ -216,22 +220,22 @@
     }
     
     .transaction-icon.deposit {
-      background: rgba(0, 214, 125, 0.15);
+      background: rgba(52, 211, 153, 0.15);
       color: var(--accent-green);
     }
     
     .transaction-icon.withdrawal {
-      background: rgba(255, 90, 90, 0.15);
+      background: rgba(249, 113, 113, 0.15);
       color: var(--accent-red);
     }
     
     .transaction-icon.interest {
-      background: rgba(255, 215, 0, 0.15);
+      background: rgba(245, 158, 11, 0.15);
       color: var(--accent-gold);
     }
     
     .transaction-icon.earned {
-      background: rgba(255, 215, 0, 0.15);
+      background: rgba(245, 158, 11, 0.15);
       color: var(--accent-gold);
     }
     
@@ -268,131 +272,56 @@
     .transaction-amount.positive { color: var(--accent-green); }
     .transaction-amount.negative { color: var(--accent-red); }
     
-    /* Settings Items */
-    .settings-section {
-      margin-bottom: var(--space-lg);
-    }
-    
-    .settings-section-title {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      margin-bottom: var(--space-md);
-    }
-    
-    .settings-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: var(--space-md) 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .settings-item:last-child {
-      border-bottom: none;
-    }
-    
-    .settings-label {
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-    
-    .settings-sublabel {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-    
-    .settings-value {
-      display: flex;
-      align-items: center;
-      gap: var(--space-xs);
-    }
-    
-    .settings-input {
-      width: 80px;
-      padding: var(--space-sm) var(--space-md);
-      background: var(--bg-secondary);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: var(--radius-sm);
-      color: var(--text-primary);
-      font-family: var(--font-body);
-      font-size: 1rem;
+    /* Kid PIN Modal */
+    .pin-modal {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: var(--space-xl);
+      padding-bottom: calc(var(--safe-bottom) + var(--space-xl));
+      width: 100%;
+      max-width: 500px;
       text-align: center;
+      transform: translateY(100%);
+      transition: transform var(--transition-normal);
+      border-top: 3px solid var(--accent-gold);
     }
     
-    .settings-input:focus {
-      outline: none;
-      border-color: var(--accent-green);
+    .modal-overlay.active .pin-modal {
+      transform: translateY(0);
     }
     
-    select.settings-input {
-      width: auto;
-      cursor: pointer;
-    }
-    
-    .danger-btn {
-      background: var(--accent-red);
-      color: white;
-      border: none;
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--radius-sm);
-      font-family: var(--font-body);
-      font-weight: 600;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-    
-    .danger-btn:hover {
-      filter: brightness(1.1);
-    }
-    
-    .secondary-btn {
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: var(--space-sm) var(--space-md);
-      border-radius: var(--radius-sm);
-      font-family: var(--font-body);
-      font-weight: 600;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-    
-    .secondary-btn:hover {
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-    }
-    
-    /* PIN Input */
-    .pin-container {
-      display: flex;
-      justify-content: center;
-      gap: var(--space-md);
-      margin: var(--space-xl) 0;
-    }
-    
-    .pin-subtitle {
-      text-align: center;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-top: calc(-1 * var(--space-md));
+    .pin-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
       margin-bottom: var(--space-sm);
     }
     
+    .pin-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    
     .pin-dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--bg-secondary);
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      background: var(--bg-elevated);
+      border: 2px solid rgba(0, 184, 169, 0.3);
       transition: all var(--transition-fast);
     }
     
     .pin-dot.filled {
-      background: var(--accent-green);
-      border-color: var(--accent-green);
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-glow-teal);
     }
     
     .pin-keypad {
@@ -404,47 +333,65 @@
     }
     
     .pin-key {
-      aspect-ratio: 1;
-      border-radius: var(--radius-lg);
-      background: var(--bg-secondary);
-      border: none;
-      color: var(--text-primary);
+      height: 64px;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border: 2px solid transparent;
       font-family: var(--font-display);
       font-size: 1.5rem;
-      font-weight: 600;
+      font-weight: 700;
+      color: var(--text-primary);
       cursor: pointer;
       transition: all var(--transition-fast);
     }
     
     .pin-key:hover {
-      background: var(--bg-elevated);
+      background: var(--bg-card);
+      border-color: var(--accent-primary);
     }
     
     .pin-key:active {
       transform: scale(0.95);
+      background: rgba(0, 184, 169, 0.1);
     }
     
-    .pin-key.backspace {
-      font-size: 1.2rem;
+    .pin-key.action {
+      font-size: 0.875rem;
+      color: var(--text-muted);
     }
     
-    /* Confirm Button in Modal */
-    .modal-btn.confirm.withdrawal {
-      background: var(--gradient-red);
-      color: white;
-      box-shadow: none;
+    .pin-key.action:hover {
+      color: var(--accent-primary);
     }
     
-    .modal-btn.confirm.earned,
-    .btn-primary.earned {
-      background: var(--gradient-gold);
-      color: #000;
-      box-shadow: var(--shadow-glow-gold);
+    .pin-key svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .loading-overlay.hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="app" id="mainApp" style="display: none;">
     <!-- Header -->
     <header class="header">
       <a href="index.html" class="header-back">
@@ -453,72 +400,67 @@
         </svg>
         Home
       </a>
+      <h1 class="header-title">My Wallet</h1>
       <div class="header-actions">
-        <button class="icon-btn" onclick="openSettings()" aria-label="Settings">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/>
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-          </svg>
-        </button>
+        <!-- Settings moved to admin page -->
       </div>
     </header>
     
     <!-- Balance Card -->
-    <div class="balance-card animate-slide-up">
+    <div class="balance-card">
       <p class="balance-label">Current Balance</p>
       <p class="balance-amount" id="balanceAmount">$0.00</p>
     </div>
     
     <!-- Stats Row -->
-    <div class="stats-row stagger-children">
+    <div class="stats-row">
       <div class="stat-card">
-        <p class="stat-value gold" id="totalEarned">$0</p>
-        <p class="stat-label">Earned</p>
+        <p class="stat-value positive" id="totalDeposits">$0</p>
+        <p class="stat-label">Deposits</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-value gold" id="totalInterest">$0</p>
+        <p class="stat-label">Interest</p>
       </div>
       <div class="stat-card">
         <p class="stat-value negative" id="totalSpent">$0</p>
         <p class="stat-label">Spent</p>
       </div>
-      <div class="stat-card">
-        <p class="stat-value positive" id="totalInterest">$0</p>
-        <p class="stat-label">Interest</p>
-      </div>
     </div>
+    
+    <!-- Earned Money Button -->
+    <button class="action-btn action-btn-earned" onclick="handleEarnedClick()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+      </svg>
+      I Earned Money!
+    </button>
     
     <!-- Action Buttons -->
     <div class="action-buttons">
       <button class="action-btn action-btn-deposit" onclick="openModal('deposit')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 5v14M5 12h14"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 8v8M8 12h8"/>
         </svg>
         Add Money
       </button>
       <button class="action-btn action-btn-withdraw" onclick="openModal('withdrawal')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12h14"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M8 12h8"/>
         </svg>
-        Spend
+        Spend Money
       </button>
     </div>
-    
-    <!-- I Earned It Button -->
-    <button class="action-btn action-btn-earned" onclick="handleEarnedClick()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-      </svg>
-      I Earned It!
-    </button>
     
     <!-- Transactions -->
     <div class="section-header">
       <h2 class="section-title">Recent Activity</h2>
     </div>
+    
     <div class="transactions-list" id="transactionsList">
-      <div class="empty-state">
-        <div class="empty-state-icon">💰</div>
-        <p class="empty-state-title">No transactions yet</p>
-        <p class="empty-state-text">Add some money to get started!</p>
-      </div>
+      <!-- Transactions loaded dynamically -->
     </div>
   </div>
   
@@ -527,147 +469,56 @@
     <div class="modal">
       <div class="modal-handle"></div>
       <h2 class="modal-title" id="modalTitle">Add Money</h2>
+      
       <div class="form-group">
         <label class="form-label">Amount</label>
         <input type="number" class="form-input amount" id="amountInput" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
       </div>
+      
       <div class="form-group">
-        <label class="form-label">What's it for?</label>
-        <input type="text" class="form-input" id="descriptionInput" placeholder="e.g., Allowance, Birthday gift...">
+        <label class="form-label">Description (optional)</label>
+        <input type="text" class="form-input" id="descriptionInput" placeholder="What's this for?">
       </div>
+      
       <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-        <button class="btn btn-primary" id="confirmBtn" onclick="confirmTransaction()">Add</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- PIN Modal (Parent) -->
-  <div class="modal-overlay" id="pinModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h2 class="modal-title">Enter Parent PIN</h2>
-      <div class="pin-container">
-        <div class="pin-dot" id="pin1"></div>
-        <div class="pin-dot" id="pin2"></div>
-        <div class="pin-dot" id="pin3"></div>
-        <div class="pin-dot" id="pin4"></div>
-      </div>
-      <div class="pin-keypad">
-        <button class="pin-key" onclick="enterPin(1)">1</button>
-        <button class="pin-key" onclick="enterPin(2)">2</button>
-        <button class="pin-key" onclick="enterPin(3)">3</button>
-        <button class="pin-key" onclick="enterPin(4)">4</button>
-        <button class="pin-key" onclick="enterPin(5)">5</button>
-        <button class="pin-key" onclick="enterPin(6)">6</button>
-        <button class="pin-key" onclick="enterPin(7)">7</button>
-        <button class="pin-key" onclick="enterPin(8)">8</button>
-        <button class="pin-key" onclick="enterPin(9)">9</button>
-        <button class="pin-key" onclick="closePinModal()">✕</button>
-        <button class="pin-key" onclick="enterPin(0)">0</button>
-        <button class="pin-key backspace" onclick="deletePin()">⌫</button>
+        <button class="btn btn-primary" id="submitBtn" onclick="submitTransaction()">Add</button>
       </div>
     </div>
   </div>
   
   <!-- Kid PIN Modal -->
   <div class="modal-overlay" id="kidPinModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h2 class="modal-title" id="kidPinTitle">Enter Your PIN</h2>
+    <div class="pin-modal">
+      <h2 class="pin-title" id="kidPinTitle">Enter Your PIN</h2>
       <p class="pin-subtitle" id="kidPinSubtitle">Enter your secret PIN to continue</p>
-      <div class="pin-container">
+      
+      <div class="pin-dots">
         <div class="pin-dot" id="kidPin1"></div>
         <div class="pin-dot" id="kidPin2"></div>
         <div class="pin-dot" id="kidPin3"></div>
         <div class="pin-dot" id="kidPin4"></div>
       </div>
+      
       <div class="pin-keypad">
-        <button class="pin-key" onclick="enterKidPin(1)">1</button>
-        <button class="pin-key" onclick="enterKidPin(2)">2</button>
-        <button class="pin-key" onclick="enterKidPin(3)">3</button>
-        <button class="pin-key" onclick="enterKidPin(4)">4</button>
-        <button class="pin-key" onclick="enterKidPin(5)">5</button>
-        <button class="pin-key" onclick="enterKidPin(6)">6</button>
-        <button class="pin-key" onclick="enterKidPin(7)">7</button>
-        <button class="pin-key" onclick="enterKidPin(8)">8</button>
-        <button class="pin-key" onclick="enterKidPin(9)">9</button>
-        <button class="pin-key" onclick="closeKidPinModal()">✕</button>
-        <button class="pin-key" onclick="enterKidPin(0)">0</button>
-        <button class="pin-key backspace" onclick="deleteKidPin()">⌫</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Settings Modal -->
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h2 class="modal-title">Settings</h2>
-      
-      <div class="settings-section">
-        <p class="settings-section-title">Interest</p>
-        <div class="settings-item">
-          <div>
-            <p class="settings-label">Interest Rate</p>
-            <p class="settings-sublabel">Monthly compound interest</p>
-          </div>
-          <div class="settings-value">
-            <input type="number" class="settings-input" id="interestRateInput" value="5" min="0" max="100" step="0.5">
-            <span>%</span>
-          </div>
-        </div>
-        <div class="settings-item">
-          <div>
-            <p class="settings-label">Interest Day</p>
-            <p class="settings-sublabel">Day of month to add interest</p>
-          </div>
-          <div class="settings-value">
-            <select class="settings-input" id="interestDayInput">
-              <option value="1">1st</option>
-              <option value="15">15th</option>
-              <option value="28">28th</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      
-      <div class="settings-section">
-        <p class="settings-section-title">Security</p>
-        <div class="settings-item">
-          <div>
-            <p class="settings-label">Parent PIN</p>
-            <p class="settings-sublabel">Required to access settings</p>
-          </div>
-          <div class="settings-value">
-            <input type="password" class="settings-input" id="pinInput" maxlength="4" placeholder="****" inputmode="numeric">
-          </div>
-        </div>
-        <div class="settings-item">
-          <div>
-            <p class="settings-label">Kid's PIN</p>
-            <p class="settings-sublabel" id="kidPinStatus">Not set yet</p>
-          </div>
-          <div class="settings-value">
-            <button class="secondary-btn" id="resetKidPinBtn" onclick="resetKidPin()" style="display: none;">Reset</button>
-          </div>
-        </div>
-      </div>
-      
-      <div class="settings-section">
-        <p class="settings-section-title">Danger Zone</p>
-        <div class="settings-item">
-          <div>
-            <p class="settings-label">Reset Everything</p>
-            <p class="settings-sublabel">Clear all data and start fresh</p>
-          </div>
-          <button class="danger-btn" onclick="confirmReset()">Reset</button>
-        </div>
-      </div>
-      
-      <div class="modal-actions">
-        <button class="btn btn-secondary" onclick="closeSettings()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+        <button class="pin-key" onclick="enterKidPin('1')">1</button>
+        <button class="pin-key" onclick="enterKidPin('2')">2</button>
+        <button class="pin-key" onclick="enterKidPin('3')">3</button>
+        <button class="pin-key" onclick="enterKidPin('4')">4</button>
+        <button class="pin-key" onclick="enterKidPin('5')">5</button>
+        <button class="pin-key" onclick="enterKidPin('6')">6</button>
+        <button class="pin-key" onclick="enterKidPin('7')">7</button>
+        <button class="pin-key" onclick="enterKidPin('8')">8</button>
+        <button class="pin-key" onclick="enterKidPin('9')">9</button>
+        <button class="pin-key action" onclick="closeKidPinModal()">Cancel</button>
+        <button class="pin-key" onclick="enterKidPin('0')">0</button>
+        <button class="pin-key action" onclick="deleteKidPin()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="12" y2="15"/>
+            <line x1="12" y1="9" x2="18" y2="15"/>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -677,6 +528,8 @@
 
   <script type="module">
     import {
+      onAuthChange,
+      isAuthenticated,
       getWalletData,
       updateWalletData,
       subscribeToWallet,
@@ -692,71 +545,76 @@
     // State
     let walletData = null;
     let transactions = [];
-    let currentModalType = 'deposit';
-    let enteredPin = '';
-    let pinAction = null;
-    
-    // Kid PIN state
+    let currentModalType = null;
     let enteredKidPin = '';
     let kidPinMode = 'verify'; // 'verify', 'setup', 'confirm'
     let kidPinSetupValue = '';
     
     // DOM Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const mainApp = document.getElementById('mainApp');
     const balanceAmountEl = document.getElementById('balanceAmount');
-    const totalEarnedEl = document.getElementById('totalEarned');
-    const totalSpentEl = document.getElementById('totalSpent');
+    const totalDepositsEl = document.getElementById('totalDeposits');
     const totalInterestEl = document.getElementById('totalInterest');
+    const totalSpentEl = document.getElementById('totalSpent');
     const transactionsListEl = document.getElementById('transactionsList');
+    
+    // Auth check
+    onAuthChange((user) => {
+      if (user) {
+        loadingOverlay.classList.add('hidden');
+        mainApp.style.display = 'block';
+        init();
+      } else {
+        // Not authenticated, redirect to home
+        window.location.href = 'index.html';
+      }
+    });
     
     // Update UI
     function updateUI() {
       if (!walletData) return;
       
-      // Balance
-      balanceAmountEl.textContent = formatCurrency(walletData.balance || 0);
-      balanceAmountEl.classList.add('updating');
-      setTimeout(() => balanceAmountEl.classList.remove('updating'), 150);
-      
-      // Stats
-      totalEarnedEl.textContent = formatCurrency(walletData.totalEarned || 0);
-      totalSpentEl.textContent = formatCurrency(walletData.totalSpent || 0);
+      balanceAmountEl.textContent = formatCurrency(walletData.balance);
+      totalDepositsEl.textContent = formatCurrency(walletData.totalDeposits || 0);
       totalInterestEl.textContent = formatCurrency(walletData.totalInterest || 0);
+      totalSpentEl.textContent = formatCurrency(walletData.totalSpent || 0);
     }
     
+    // Render Transactions
     function renderTransactions() {
-      if (!transactions || transactions.length === 0) {
+      if (transactions.length === 0) {
         transactionsListEl.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">💰</div>
+            <div class="empty-state-icon">📝</div>
             <p class="empty-state-title">No transactions yet</p>
-            <p class="empty-state-text">Add some money to get started!</p>
+            <p class="empty-state-text">Start by adding some money!</p>
           </div>
         `;
         return;
       }
       
       transactionsListEl.innerHTML = transactions.slice(0, 20).map(tx => {
-        const iconClass = tx.type === 'deposit' ? 'deposit' : 
-                          tx.type === 'interest' ? 'interest' : 
-                          tx.type === 'earned' ? 'earned' : 'withdrawal';
-        
-        const icon = tx.type === 'deposit' ? 
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
-          (tx.type === 'interest' || tx.type === 'earned') ?
-          '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>' :
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
-        
-        const amountClass = tx.type === 'withdrawal' ? 'negative' : 'positive';
-        const amountPrefix = tx.type === 'withdrawal' ? '-' : '+';
+        const isPositive = tx.type === 'deposit' || tx.type === 'interest' || tx.type === 'earned';
+        const icons = {
+          deposit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`,
+          withdrawal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>`,
+          interest: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+          earned: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`
+        };
         
         return `
-          <div class="transaction" data-id="${tx.id}">
-            <div class="transaction-icon ${iconClass}">${icon}</div>
+          <div class="transaction">
+            <div class="transaction-icon ${tx.type}">
+              ${icons[tx.type] || icons.deposit}
+            </div>
             <div class="transaction-details">
-              <p class="transaction-title">${tx.description}</p>
+              <p class="transaction-title">${tx.description || tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</p>
               <p class="transaction-date">${formatDate(tx.date)}</p>
             </div>
-            <span class="transaction-amount ${amountClass}">${amountPrefix}${formatCurrency(tx.amount)}</span>
+            <p class="transaction-amount ${isPositive ? 'positive' : 'negative'}">
+              ${isPositive ? '+' : '-'}${formatCurrency(tx.amount)}
+            </p>
           </div>
         `;
       }).join('');
@@ -767,75 +625,52 @@
       currentModalType = type;
       const modal = document.getElementById('transactionModal');
       const title = document.getElementById('modalTitle');
-      const confirmBtn = document.getElementById('confirmBtn');
-      const descInput = document.getElementById('descriptionInput');
+      const submitBtn = document.getElementById('submitBtn');
       
-      if (type === 'deposit') {
-        title.textContent = 'Add Money';
-        confirmBtn.textContent = 'Add';
-        confirmBtn.classList.remove('withdrawal', 'earned');
-        descInput.placeholder = 'e.g., Allowance, Birthday gift...';
-      } else if (type === 'earned') {
-        title.textContent = 'I Earned It! 🌟';
-        confirmBtn.textContent = 'Add Earnings';
-        confirmBtn.classList.remove('withdrawal');
-        confirmBtn.classList.add('earned');
-        descInput.placeholder = 'e.g., Chores, Helped neighbor, Lemonade stand...';
-      } else {
-        title.textContent = 'Spend Money';
-        confirmBtn.textContent = 'Spend';
-        confirmBtn.classList.add('withdrawal');
-        confirmBtn.classList.remove('earned');
-        descInput.placeholder = 'e.g., Toy, Game, Candy...';
-      }
+      const config = {
+        deposit: { title: 'Add Money', btn: 'Add', btnClass: 'btn-green' },
+        withdrawal: { title: 'Spend Money', btn: 'Record', btnClass: 'btn-danger' },
+        earned: { title: 'Money Earned! 🌟', btn: 'Add', btnClass: 'btn-gold' }
+      };
+      
+      const c = config[type];
+      title.textContent = c.title;
+      submitBtn.textContent = c.btn;
+      submitBtn.className = `btn ${c.btnClass}`;
       
       document.getElementById('amountInput').value = '';
-      descInput.value = '';
-      modal.classList.add('active');
+      document.getElementById('descriptionInput').value = '';
       
-      setTimeout(() => {
-        document.getElementById('amountInput').focus();
-      }, 300);
+      modal.classList.add('active');
+      setTimeout(() => document.getElementById('amountInput').focus(), 300);
     };
     
     window.closeModal = function() {
       document.getElementById('transactionModal').classList.remove('active');
     };
     
-    window.confirmTransaction = async function() {
+    window.submitTransaction = async function() {
       const amount = parseFloat(document.getElementById('amountInput').value);
-      const description = document.getElementById('descriptionInput').value.trim() || 
-        (currentModalType === 'deposit' ? 'Deposit' : 
-         currentModalType === 'earned' ? 'Earned' : 'Purchase');
+      const description = document.getElementById('descriptionInput').value.trim();
       
       if (!amount || amount <= 0) {
         showToast('Please enter a valid amount', 'error');
         return;
       }
       
-      if (currentModalType === 'withdrawal' && amount > (walletData?.balance || 0)) {
-        showToast('Not enough money!', 'error');
-        return;
-      }
-      
-      // Treat 'earned' as a deposit type for the transaction
-      const transactionType = currentModalType === 'earned' ? 'earned' : currentModalType;
-      
-      // Add transaction
-      await addTransaction({
-        type: transactionType,
+      const tx = {
+        type: currentModalType,
         amount: amount,
-        description: description
-      });
+        description: description || (currentModalType === 'earned' ? 'Money earned' : currentModalType.charAt(0).toUpperCase() + currentModalType.slice(1))
+      };
       
-      // Update wallet - earned and deposit both add money
-      const isAddingMoney = currentModalType === 'deposit' || currentModalType === 'earned';
-      const newBalance = isAddingMoney 
-        ? (walletData.balance || 0) + amount
-        : (walletData.balance || 0) - amount;
+      await addTransaction(tx);
       
+      // Update wallet balance
       const updates = {
-        balance: newBalance
+        balance: currentModalType === 'withdrawal' 
+          ? walletData.balance - amount 
+          : walletData.balance + amount
       };
       
       if (currentModalType === 'deposit') {
@@ -857,134 +692,15 @@
       showToast(messages[currentModalType], 'success');
     };
     
-    // Settings
-    window.openSettings = function() {
-      const pin = walletData?.settings?.parentPin;
-      if (pin) {
-        pinAction = 'settings';
-        document.getElementById('pinModal').classList.add('active');
-      } else {
-        showSettingsModal();
-      }
-    };
-    
-    function showSettingsModal() {
-      const modal = document.getElementById('settingsModal');
-      const settings = walletData?.settings || {};
-      
-      document.getElementById('interestRateInput').value = settings.interestRate || 5;
-      document.getElementById('interestDayInput').value = settings.interestDay || 1;
-      document.getElementById('pinInput').value = settings.parentPin || '';
-      
-      // Show kid PIN info
-      const kidPinStatus = document.getElementById('kidPinStatus');
-      const resetKidPinBtn = document.getElementById('resetKidPinBtn');
-      
-      if (settings.kidPin) {
-        kidPinStatus.textContent = `Currently: ${settings.kidPin}`;
-        resetKidPinBtn.style.display = 'block';
-      } else {
-        kidPinStatus.textContent = 'Not set yet';
-        resetKidPinBtn.style.display = 'none';
-      }
-      
-      modal.classList.add('active');
-    }
-    
-    window.closeSettings = function() {
-      document.getElementById('settingsModal').classList.remove('active');
-    };
-    
-    window.saveSettings = async function() {
-      const settings = {
-        ...walletData.settings,
-        interestRate: parseFloat(document.getElementById('interestRateInput').value) || 5,
-        interestDay: parseInt(document.getElementById('interestDayInput').value) || 1,
-        parentPin: document.getElementById('pinInput').value || null
-      };
-      
-      await updateWalletData({ settings });
-      closeSettings();
-      showToast('Settings saved!', 'success');
-    };
-    
-    window.confirmReset = function() {
-      if (confirm('Are you sure? This will delete ALL data!')) {
-        if (confirm('Really? This cannot be undone!')) {
-          localStorage.clear();
-          location.reload();
-        }
-      }
-    };
-    
-    window.resetKidPin = async function() {
-      if (confirm('Reset kid\'s PIN? They\'ll need to create a new one.')) {
-        await updateWalletData({
-          settings: {
-            ...walletData.settings,
-            kidPin: null
-          }
-        });
-        document.getElementById('kidPinStatus').textContent = 'Not set yet';
-        document.getElementById('resetKidPinBtn').style.display = 'none';
-        showToast('Kid PIN reset!', 'success');
-      }
-    };
-    
-    // PIN Functions
-    window.enterPin = function(num) {
-      if (enteredPin.length >= 4) return;
-      enteredPin += num;
-      updatePinDots();
-      
-      if (enteredPin.length === 4) {
-        setTimeout(verifyPin, 200);
-      }
-    };
-    
-    window.deletePin = function() {
-      enteredPin = enteredPin.slice(0, -1);
-      updatePinDots();
-    };
-    
-    window.closePinModal = function() {
-      document.getElementById('pinModal').classList.remove('active');
-      enteredPin = '';
-      updatePinDots();
-    };
-    
-    function updatePinDots() {
-      for (let i = 1; i <= 4; i++) {
-        const dot = document.getElementById(`pin${i}`);
-        dot.classList.toggle('filled', i <= enteredPin.length);
-      }
-    }
-    
-    function verifyPin() {
-      const correctPin = walletData?.settings?.parentPin;
-      if (enteredPin === correctPin) {
-        closePinModal();
-        if (pinAction === 'settings') {
-          showSettingsModal();
-        }
-      } else {
-        showToast('Wrong PIN!', 'error');
-        enteredPin = '';
-        updatePinDots();
-      }
-    }
-    
     // Kid PIN Functions
     window.handleEarnedClick = function() {
       const kidPin = walletData?.settings?.kidPin;
       if (!kidPin) {
-        // No PIN set - start setup flow
         kidPinMode = 'setup';
         kidPinSetupValue = '';
         document.getElementById('kidPinTitle').textContent = 'Create Your PIN 🔐';
         document.getElementById('kidPinSubtitle').textContent = 'Pick 4 numbers you\'ll remember!';
       } else {
-        // PIN exists - verify it
         kidPinMode = 'verify';
         document.getElementById('kidPinTitle').textContent = 'Enter Your PIN';
         document.getElementById('kidPinSubtitle').textContent = 'Enter your secret PIN to continue';
@@ -1025,7 +741,6 @@
     
     async function processKidPin() {
       if (kidPinMode === 'setup') {
-        // First time entering - save and ask to confirm
         kidPinSetupValue = enteredKidPin;
         kidPinMode = 'confirm';
         enteredKidPin = '';
@@ -1033,9 +748,7 @@
         document.getElementById('kidPinTitle').textContent = 'Confirm Your PIN';
         document.getElementById('kidPinSubtitle').textContent = 'Enter the same PIN again';
       } else if (kidPinMode === 'confirm') {
-        // Confirming setup
         if (enteredKidPin === kidPinSetupValue) {
-          // Save the PIN
           await updateWalletData({
             settings: {
               ...walletData.settings,
@@ -1044,7 +757,6 @@
           });
           closeKidPinModal();
           showToast('PIN created! 🎉', 'success');
-          // Now open the earned modal
           openModal('earned');
         } else {
           showToast('PINs don\'t match! Try again', 'error');
@@ -1056,7 +768,6 @@
           document.getElementById('kidPinSubtitle').textContent = 'Pick 4 numbers you\'ll remember!';
         }
       } else {
-        // Verify mode
         const correctPin = walletData?.settings?.kidPin;
         if (enteredKidPin === correctPin) {
           closeKidPinModal();
@@ -1076,14 +787,12 @@
       const interest = calculateInterest(walletData.balance, walletData.settings.interestRate);
       if (interest <= 0) return;
       
-      // Add interest transaction
       await addTransaction({
         type: 'interest',
         amount: interest,
         description: `Monthly Interest (${walletData.settings.interestRate}%)`
       });
       
-      // Update wallet
       await updateWalletData({
         balance: walletData.balance + interest,
         totalInterest: (walletData.totalInterest || 0) + interest,
@@ -1117,9 +826,6 @@
         setTimeout(() => openModal('deposit'), 500);
       }
     }
-    
-    // Start
-    init();
   </script>
 </body>
 </html>

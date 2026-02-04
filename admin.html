@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#f0f7ff">
+  <title>Parent Settings - KidsWallet</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    /* Admin Page Specific Styles */
+    
+    .admin-hero {
+      background: var(--card-teal);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-xl);
+      text-align: center;
+      border: 2px solid rgba(0, 184, 169, 0.15);
+      box-shadow: var(--shadow-card);
+    }
+    
+    .admin-hero-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto var(--space-md);
+      background: var(--gradient-primary);
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    
+    .admin-hero-icon svg {
+      width: 32px;
+      height: 32px;
+    }
+    
+    .admin-hero-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .admin-hero-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    /* Quick Stats */
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .quick-stat {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      text-align: center;
+      border: 2px solid rgba(0, 184, 169, 0.1);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .quick-stat-value {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .quick-stat-value.green { color: var(--accent-green); }
+    .quick-stat-value.gold { color: var(--accent-gold); }
+    .quick-stat-value.red { color: var(--accent-red); }
+    .quick-stat-value.blue { color: var(--accent-blue); }
+    
+    .quick-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    /* Admin Sections */
+    .admin-section {
+      margin-bottom: var(--space-xl);
+    }
+    
+    .admin-section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    
+    .admin-section-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: rgba(0, 184, 169, 0.15);
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .admin-section-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    .admin-section-icon.gold {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+    }
+    
+    .admin-section-icon.purple {
+      background: rgba(167, 139, 250, 0.15);
+      color: var(--accent-purple);
+    }
+    
+    .admin-section-icon.red {
+      background: rgba(249, 113, 113, 0.15);
+      color: var(--accent-red);
+    }
+    
+    .admin-section-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    
+    .admin-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      border: 2px solid rgba(0, 184, 169, 0.1);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* PIN Section */
+    .pin-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .pin-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .pin-row:first-child {
+      padding-top: 0;
+    }
+    
+    .pin-info {
+      flex-grow: 1;
+    }
+    
+    .pin-label {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    
+    .pin-value {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--accent-primary);
+    }
+    
+    .pin-value.not-set {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      letter-spacing: normal;
+      font-style: italic;
+    }
+    
+    /* Settings Rows */
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .settings-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    
+    .settings-row:first-child {
+      padding-top: 0;
+    }
+    
+    .settings-info {
+      flex-grow: 1;
+    }
+    
+    .settings-label {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    
+    .settings-sublabel {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    
+    .settings-control {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    
+    .settings-input {
+      width: 80px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--bg-elevated);
+      border: 2px solid rgba(0, 184, 169, 0.2);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    .settings-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px var(--accent-primary-glow);
+    }
+    
+    .settings-suffix {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    /* Transaction List */
+    .tx-filters {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+      flex-wrap: wrap;
+    }
+    
+    .tx-filter {
+      padding: var(--space-xs) var(--space-md);
+      background: var(--bg-elevated);
+      border: 2px solid transparent;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .tx-filter:hover {
+      color: var(--text-primary);
+      background: var(--bg-card);
+    }
+    
+    .tx-filter.active {
+      background: var(--bg-card);
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+    
+    .tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    .tx-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+    
+    .tx-item:hover {
+      background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .tx-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .tx-icon.deposit {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--accent-green);
+    }
+    
+    .tx-icon.withdrawal {
+      background: rgba(249, 113, 113, 0.15);
+      color: var(--accent-red);
+    }
+    
+    .tx-icon.interest {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+    }
+    
+    .tx-icon.earned {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-gold);
+    }
+    
+    .tx-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .tx-details {
+      flex-grow: 1;
+      min-width: 0;
+    }
+    
+    .tx-desc {
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    
+    .tx-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    
+    .tx-amount {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-right: var(--space-sm);
+    }
+    
+    .tx-amount.positive { color: var(--accent-green); }
+    .tx-amount.negative { color: var(--accent-red); }
+    
+    .tx-actions {
+      display: flex;
+      gap: var(--space-xs);
+      flex-shrink: 0;
+    }
+    
+    .tx-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    
+    .tx-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+    
+    .tx-btn.edit:hover {
+      color: var(--accent-blue);
+      border-color: var(--accent-blue);
+    }
+    
+    .tx-btn.undo:hover {
+      color: var(--accent-gold);
+      border-color: var(--accent-gold);
+    }
+    
+    .tx-btn.delete:hover {
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    
+    .tx-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+    
+    /* Balance Adjustment */
+    .balance-adjust {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+      background: var(--card-gold);
+      border-radius: var(--radius-lg);
+      margin-top: var(--space-md);
+    }
+    
+    .balance-adjust-info {
+      flex-grow: 1;
+    }
+    
+    .balance-adjust-label {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    
+    .balance-adjust-value {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+    
+    /* Danger Zone */
+    .danger-zone {
+      background: rgba(249, 113, 113, 0.05);
+      border: 2px solid rgba(249, 113, 113, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+    }
+    
+    .danger-zone .settings-row {
+      border-color: rgba(249, 113, 113, 0.1);
+    }
+    
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .loading-overlay.hidden {
+      display: none;
+    }
+    
+    /* PIN Entry Modal */
+    .pin-modal {
+      background: var(--bg-card);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: var(--space-xl);
+      padding-bottom: calc(var(--safe-bottom) + var(--space-xl));
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      transform: translateY(100%);
+      transition: transform var(--transition-normal);
+      border-top: 3px solid var(--accent-purple);
+    }
+    
+    .modal-overlay.active .pin-modal {
+      transform: translateY(0);
+    }
+    
+    .pin-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .pin-subtitle {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .pin-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      background: var(--bg-elevated);
+      border: 2px solid rgba(0, 184, 169, 0.3);
+      transition: all var(--transition-fast);
+    }
+    
+    .pin-dot.filled {
+      background: var(--accent-purple);
+      border-color: var(--accent-purple);
+      box-shadow: var(--shadow-glow-purple);
+    }
+    
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    
+    .pin-key {
+      height: 64px;
+      border-radius: var(--radius-md);
+      background: var(--bg-elevated);
+      border: 2px solid transparent;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .pin-key:hover {
+      background: var(--bg-card);
+      border-color: var(--accent-purple);
+    }
+    
+    .pin-key:active {
+      transform: scale(0.95);
+      background: rgba(167, 139, 250, 0.1);
+    }
+    
+    .pin-key.action {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .pin-key.action:hover {
+      color: var(--accent-purple);
+    }
+    
+    .pin-key svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    /* Edit Transaction Modal */
+    .edit-modal .modal {
+      border-top-color: var(--accent-blue);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+  
+  <!-- PIN Entry Modal -->
+  <div class="modal-overlay" id="pinModal">
+    <div class="pin-modal">
+      <h2 class="pin-title">Parent PIN Required</h2>
+      <p class="pin-subtitle">Enter your 4-digit parent PIN to continue</p>
+      
+      <div class="pin-dots">
+        <div class="pin-dot" id="pin1"></div>
+        <div class="pin-dot" id="pin2"></div>
+        <div class="pin-dot" id="pin3"></div>
+        <div class="pin-dot" id="pin4"></div>
+      </div>
+      
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="enterPin('1')">1</button>
+        <button class="pin-key" onclick="enterPin('2')">2</button>
+        <button class="pin-key" onclick="enterPin('3')">3</button>
+        <button class="pin-key" onclick="enterPin('4')">4</button>
+        <button class="pin-key" onclick="enterPin('5')">5</button>
+        <button class="pin-key" onclick="enterPin('6')">6</button>
+        <button class="pin-key" onclick="enterPin('7')">7</button>
+        <button class="pin-key" onclick="enterPin('8')">8</button>
+        <button class="pin-key" onclick="enterPin('9')">9</button>
+        <button class="pin-key action" onclick="cancelPin()">Cancel</button>
+        <button class="pin-key" onclick="enterPin('0')">0</button>
+        <button class="pin-key action" onclick="deletePin()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="12" y2="15"/>
+            <line x1="12" y1="9" x2="18" y2="15"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app" id="mainApp" style="display: none;">
+    <!-- Header -->
+    <header class="header">
+      <a href="index.html" class="header-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Home
+      </a>
+      <h1 class="header-title">Settings</h1>
+      <div class="header-actions"></div>
+    </header>
+    
+    <!-- Admin Hero -->
+    <div class="admin-hero">
+      <div class="admin-hero-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </div>
+      <h2 class="admin-hero-title">Parent Dashboard</h2>
+      <p class="admin-hero-subtitle">Manage your child's wallet and settings</p>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="quick-stats">
+      <div class="quick-stat">
+        <p class="quick-stat-value green" id="statBalance">$0.00</p>
+        <p class="quick-stat-label">Current Balance</p>
+      </div>
+      <div class="quick-stat">
+        <p class="quick-stat-value gold" id="statEarned">$0.00</p>
+        <p class="quick-stat-label">Total Earned</p>
+      </div>
+      <div class="quick-stat">
+        <p class="quick-stat-value blue" id="statInterest">$0.00</p>
+        <p class="quick-stat-label">Interest Earned</p>
+      </div>
+      <div class="quick-stat">
+        <p class="quick-stat-value red" id="statSpent">$0.00</p>
+        <p class="quick-stat-label">Total Spent</p>
+      </div>
+    </div>
+    
+    <!-- PIN Management -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-icon purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </div>
+        <h2 class="admin-section-title">PIN Management</h2>
+      </div>
+      
+      <div class="admin-card">
+        <div class="pin-row">
+          <div class="pin-info">
+            <p class="pin-label">Parent PIN</p>
+            <p class="pin-value" id="parentPinDisplay">Not set</p>
+          </div>
+          <button class="btn btn-sm btn-secondary" onclick="openSetPinModal('parent')">
+            <span id="parentPinBtnText">Set PIN</span>
+          </button>
+        </div>
+        
+        <div class="pin-row">
+          <div class="pin-info">
+            <p class="pin-label">Kid's PIN</p>
+            <p class="pin-value" id="kidPinDisplay">Not set</p>
+          </div>
+          <button class="btn btn-sm btn-secondary" onclick="resetKidPin()" id="kidPinBtn" style="display: none;">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Interest Settings -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-icon gold">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+          </svg>
+        </div>
+        <h2 class="admin-section-title">Interest Settings</h2>
+      </div>
+      
+      <div class="admin-card">
+        <div class="settings-row">
+          <div class="settings-info">
+            <p class="settings-label">Interest Rate</p>
+            <p class="settings-sublabel">Monthly compound interest on balance</p>
+          </div>
+          <div class="settings-control">
+            <input type="number" class="settings-input" id="interestRateInput" min="0" max="100" step="0.5" value="5">
+            <span class="settings-suffix">%</span>
+          </div>
+        </div>
+        
+        <div class="settings-row">
+          <div class="settings-info">
+            <p class="settings-label">Interest Day</p>
+            <p class="settings-sublabel">Day of month to apply interest</p>
+          </div>
+          <div class="settings-control">
+            <input type="number" class="settings-input" id="interestDayInput" min="1" max="28" value="1">
+          </div>
+        </div>
+        
+        <button class="btn btn-primary btn-full mt-md" onclick="saveInterestSettings()">
+          Save Interest Settings
+        </button>
+      </div>
+    </div>
+    
+    <!-- Transaction Management -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+        </div>
+        <h2 class="admin-section-title">Transaction History</h2>
+      </div>
+      
+      <div class="admin-card">
+        <div class="tx-filters">
+          <button class="tx-filter active" data-filter="all" onclick="filterTransactions('all')">All</button>
+          <button class="tx-filter" data-filter="deposit" onclick="filterTransactions('deposit')">Deposits</button>
+          <button class="tx-filter" data-filter="earned" onclick="filterTransactions('earned')">Earned</button>
+          <button class="tx-filter" data-filter="withdrawal" onclick="filterTransactions('withdrawal')">Spent</button>
+          <button class="tx-filter" data-filter="interest" onclick="filterTransactions('interest')">Interest</button>
+        </div>
+        
+        <div class="tx-list" id="transactionList">
+          <!-- Transactions loaded dynamically -->
+        </div>
+        
+        <!-- Balance Adjustment -->
+        <div class="balance-adjust">
+          <div class="balance-adjust-info">
+            <p class="balance-adjust-label">Adjust Balance Directly</p>
+            <p class="balance-adjust-value" id="currentBalanceDisplay">$0.00</p>
+          </div>
+          <button class="btn btn-sm btn-gold" onclick="openBalanceModal()">Adjust</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Danger Zone -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h2 class="admin-section-title">Danger Zone</h2>
+      </div>
+      
+      <div class="danger-zone">
+        <div class="settings-row">
+          <div class="settings-info">
+            <p class="settings-label">Reset All Data</p>
+            <p class="settings-sublabel">Delete all transactions and reset balance to zero</p>
+          </div>
+          <button class="btn btn-sm btn-danger" onclick="confirmResetAll()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Edit Transaction Modal -->
+  <div class="modal-overlay edit-modal" id="editModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title">Edit Transaction</h2>
+      
+      <div class="form-group">
+        <label class="form-label">Amount</label>
+        <input type="number" class="form-input amount" id="editAmountInput" step="0.01" min="0.01">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <input type="text" class="form-input" id="editDescInput">
+      </div>
+      
+      <input type="hidden" id="editTxId">
+      <input type="hidden" id="editTxType">
+      <input type="hidden" id="editTxOriginalAmount">
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-blue" onclick="saveTransactionEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Balance Adjust Modal -->
+  <div class="modal-overlay" id="balanceModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title">Adjust Balance</h2>
+      
+      <div class="form-group">
+        <label class="form-label">New Balance</label>
+        <input type="number" class="form-input amount" id="newBalanceInput" step="0.01" min="0">
+      </div>
+      
+      <p class="form-hint">This will create an adjustment transaction to match the new balance.</p>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeBalanceModal()">Cancel</button>
+        <button class="btn btn-gold" onclick="saveBalanceAdjust()">Adjust Balance</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Set PIN Modal -->
+  <div class="modal-overlay" id="setPinModal">
+    <div class="pin-modal">
+      <h2 class="pin-title" id="setPinTitle">Set Parent PIN</h2>
+      <p class="pin-subtitle" id="setPinSubtitle">Choose a 4-digit PIN</p>
+      
+      <div class="pin-dots">
+        <div class="pin-dot" id="newPin1"></div>
+        <div class="pin-dot" id="newPin2"></div>
+        <div class="pin-dot" id="newPin3"></div>
+        <div class="pin-dot" id="newPin4"></div>
+      </div>
+      
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="enterNewPin('1')">1</button>
+        <button class="pin-key" onclick="enterNewPin('2')">2</button>
+        <button class="pin-key" onclick="enterNewPin('3')">3</button>
+        <button class="pin-key" onclick="enterNewPin('4')">4</button>
+        <button class="pin-key" onclick="enterNewPin('5')">5</button>
+        <button class="pin-key" onclick="enterNewPin('6')">6</button>
+        <button class="pin-key" onclick="enterNewPin('7')">7</button>
+        <button class="pin-key" onclick="enterNewPin('8')">8</button>
+        <button class="pin-key" onclick="enterNewPin('9')">9</button>
+        <button class="pin-key action" onclick="closeSetPinModal()">Cancel</button>
+        <button class="pin-key" onclick="enterNewPin('0')">0</button>
+        <button class="pin-key action" onclick="deleteNewPin()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+            <line x1="18" y1="9" x2="12" y2="15"/>
+            <line x1="12" y1="9" x2="18" y2="15"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import {
+      onAuthChange,
+      getWalletData,
+      updateWalletData,
+      subscribeToWallet,
+      subscribeToTransactions,
+      getTransactions,
+      updateTransaction,
+      deleteTransaction,
+      addTransaction,
+      formatCurrency,
+      formatDateTime,
+      showToast,
+      getLocalData
+    } from './shared.js';
+    
+    // State
+    let walletData = null;
+    let transactions = [];
+    let currentFilter = 'all';
+    let enteredPin = '';
+    let pinVerified = false;
+    let newPinValue = '';
+    let newPinConfirm = '';
+    let setPinMode = 'enter'; // 'enter', 'confirm'
+    let setPinTarget = 'parent'; // 'parent'
+    
+    // DOM Elements
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const mainApp = document.getElementById('mainApp');
+    const pinModal = document.getElementById('pinModal');
+    
+    // Auth check
+    onAuthChange((user) => {
+      if (user) {
+        loadingOverlay.classList.add('hidden');
+        initAdmin();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+    
+    // Initialize admin page
+    async function initAdmin() {
+      // Subscribe to wallet updates
+      subscribeToWallet((data) => {
+        walletData = data;
+        
+        // Check if parent PIN is required
+        if (walletData?.settings?.parentPin && !pinVerified) {
+          pinModal.classList.add('active');
+          mainApp.style.display = 'none';
+        } else {
+          pinVerified = true;
+          mainApp.style.display = 'block';
+          updateUI();
+        }
+      });
+      
+      // Subscribe to transactions
+      subscribeToTransactions((txs) => {
+        transactions = txs;
+        renderTransactions();
+      });
+    }
+    
+    // Update UI with wallet data
+    function updateUI() {
+      if (!walletData) return;
+      
+      // Stats
+      document.getElementById('statBalance').textContent = formatCurrency(walletData.balance || 0);
+      document.getElementById('statEarned').textContent = formatCurrency(walletData.totalEarned || 0);
+      document.getElementById('statInterest').textContent = formatCurrency(walletData.totalInterest || 0);
+      document.getElementById('statSpent').textContent = formatCurrency(walletData.totalSpent || 0);
+      document.getElementById('currentBalanceDisplay').textContent = formatCurrency(walletData.balance || 0);
+      
+      // PIN displays
+      const parentPin = walletData.settings?.parentPin;
+      const kidPin = walletData.settings?.kidPin;
+      
+      const parentPinDisplay = document.getElementById('parentPinDisplay');
+      const parentPinBtnText = document.getElementById('parentPinBtnText');
+      if (parentPin) {
+        parentPinDisplay.textContent = parentPin;
+        parentPinDisplay.classList.remove('not-set');
+        parentPinBtnText.textContent = 'Change';
+      } else {
+        parentPinDisplay.textContent = 'Not set';
+        parentPinDisplay.classList.add('not-set');
+        parentPinBtnText.textContent = 'Set PIN';
+      }
+      
+      const kidPinDisplay = document.getElementById('kidPinDisplay');
+      const kidPinBtn = document.getElementById('kidPinBtn');
+      if (kidPin) {
+        kidPinDisplay.textContent = kidPin;
+        kidPinDisplay.classList.remove('not-set');
+        kidPinBtn.style.display = 'block';
+      } else {
+        kidPinDisplay.textContent = 'Not set (kid will create on first use)';
+        kidPinDisplay.classList.add('not-set');
+        kidPinBtn.style.display = 'none';
+      }
+      
+      // Interest settings
+      document.getElementById('interestRateInput').value = walletData.settings?.interestRate || 5;
+      document.getElementById('interestDayInput').value = walletData.settings?.interestDay || 1;
+    }
+    
+    // Render transactions
+    function renderTransactions() {
+      const list = document.getElementById('transactionList');
+      
+      let filtered = transactions;
+      if (currentFilter !== 'all') {
+        filtered = transactions.filter(tx => tx.type === currentFilter);
+      }
+      
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📝</div>
+            <p class="empty-state-title">No transactions</p>
+            <p class="empty-state-text">${currentFilter === 'all' ? 'No transactions recorded yet' : 'No ' + currentFilter + ' transactions'}</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const icons = {
+        deposit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`,
+        withdrawal: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/></svg>`,
+        interest: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>`,
+        earned: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>`
+      };
+      
+      list.innerHTML = filtered.map(tx => {
+        const isPositive = tx.type === 'deposit' || tx.type === 'interest' || tx.type === 'earned';
+        
+        return `
+          <div class="tx-item" data-id="${tx.id}">
+            <div class="tx-icon ${tx.type}">
+              ${icons[tx.type] || icons.deposit}
+            </div>
+            <div class="tx-details">
+              <p class="tx-desc">${tx.description || tx.type}</p>
+              <p class="tx-date">${formatDateTime(tx.date)}</p>
+            </div>
+            <p class="tx-amount ${isPositive ? 'positive' : 'negative'}">
+              ${isPositive ? '+' : '-'}${formatCurrency(tx.amount)}
+            </p>
+            <div class="tx-actions">
+              <button class="tx-btn edit" onclick="openEditModal('${tx.id}')" title="Edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button class="tx-btn undo" onclick="undoTransaction('${tx.id}')" title="Undo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 7v6h6"/>
+                  <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/>
+                </svg>
+              </button>
+              <button class="tx-btn delete" onclick="confirmDeleteTx('${tx.id}')" title="Delete">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Filter transactions
+    window.filterTransactions = function(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.tx-filter').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      renderTransactions();
+    };
+    
+    // PIN entry for verification
+    window.enterPin = function(num) {
+      if (enteredPin.length >= 4) return;
+      enteredPin += num;
+      updatePinDots('pin', enteredPin.length);
+      
+      if (enteredPin.length === 4) {
+        setTimeout(verifyPin, 200);
+      }
+    };
+    
+    window.deletePin = function() {
+      enteredPin = enteredPin.slice(0, -1);
+      updatePinDots('pin', enteredPin.length);
+    };
+    
+    window.cancelPin = function() {
+      window.location.href = 'index.html';
+    };
+    
+    function verifyPin() {
+      const correctPin = walletData?.settings?.parentPin;
+      if (enteredPin === correctPin) {
+        pinVerified = true;
+        pinModal.classList.remove('active');
+        mainApp.style.display = 'block';
+        updateUI();
+      } else {
+        showToast('Wrong PIN!', 'error');
+        enteredPin = '';
+        updatePinDots('pin', 0);
+      }
+    }
+    
+    function updatePinDots(prefix, count) {
+      for (let i = 1; i <= 4; i++) {
+        const dot = document.getElementById(`${prefix}${i}`);
+        if (dot) dot.classList.toggle('filled', i <= count);
+      }
+    }
+    
+    // Set PIN modal
+    window.openSetPinModal = function(target) {
+      setPinTarget = target;
+      setPinMode = 'enter';
+      newPinValue = '';
+      newPinConfirm = '';
+      updatePinDots('newPin', 0);
+      
+      document.getElementById('setPinTitle').textContent = 'Set Parent PIN';
+      document.getElementById('setPinSubtitle').textContent = 'Choose a 4-digit PIN';
+      document.getElementById('setPinModal').classList.add('active');
+    };
+    
+    window.closeSetPinModal = function() {
+      document.getElementById('setPinModal').classList.remove('active');
+    };
+    
+    window.enterNewPin = function(num) {
+      if (setPinMode === 'enter') {
+        if (newPinValue.length >= 4) return;
+        newPinValue += num;
+        updatePinDots('newPin', newPinValue.length);
+        
+        if (newPinValue.length === 4) {
+          setTimeout(() => {
+            setPinMode = 'confirm';
+            updatePinDots('newPin', 0);
+            document.getElementById('setPinTitle').textContent = 'Confirm PIN';
+            document.getElementById('setPinSubtitle').textContent = 'Enter the same PIN again';
+          }, 300);
+        }
+      } else {
+        if (newPinConfirm.length >= 4) return;
+        newPinConfirm += num;
+        updatePinDots('newPin', newPinConfirm.length);
+        
+        if (newPinConfirm.length === 4) {
+          setTimeout(saveNewPin, 200);
+        }
+      }
+    };
+    
+    window.deleteNewPin = function() {
+      if (setPinMode === 'enter') {
+        newPinValue = newPinValue.slice(0, -1);
+        updatePinDots('newPin', newPinValue.length);
+      } else {
+        newPinConfirm = newPinConfirm.slice(0, -1);
+        updatePinDots('newPin', newPinConfirm.length);
+      }
+    };
+    
+    async function saveNewPin() {
+      if (newPinValue !== newPinConfirm) {
+        showToast('PINs don\'t match! Try again', 'error');
+        setPinMode = 'enter';
+        newPinValue = '';
+        newPinConfirm = '';
+        updatePinDots('newPin', 0);
+        document.getElementById('setPinTitle').textContent = 'Set Parent PIN';
+        document.getElementById('setPinSubtitle').textContent = 'Choose a 4-digit PIN';
+        return;
+      }
+      
+      await updateWalletData({
+        settings: {
+          ...walletData.settings,
+          parentPin: newPinValue
+        }
+      });
+      
+      closeSetPinModal();
+      showToast('Parent PIN saved!', 'success');
+      pinVerified = true;
+    }
+    
+    // Reset kid PIN
+    window.resetKidPin = async function() {
+      if (confirm('Reset kid\'s PIN? They\'ll need to create a new one.')) {
+        await updateWalletData({
+          settings: {
+            ...walletData.settings,
+            kidPin: null
+          }
+        });
+        showToast('Kid\'s PIN reset!', 'success');
+      }
+    };
+    
+    // Save interest settings
+    window.saveInterestSettings = async function() {
+      const rate = parseFloat(document.getElementById('interestRateInput').value) || 5;
+      const day = parseInt(document.getElementById('interestDayInput').value) || 1;
+      
+      await updateWalletData({
+        settings: {
+          ...walletData.settings,
+          interestRate: Math.max(0, Math.min(100, rate)),
+          interestDay: Math.max(1, Math.min(28, day))
+        }
+      });
+      
+      showToast('Interest settings saved!', 'success');
+    };
+    
+    // Edit transaction
+    window.openEditModal = function(txId) {
+      const tx = transactions.find(t => t.id === txId);
+      if (!tx) return;
+      
+      document.getElementById('editTxId').value = txId;
+      document.getElementById('editTxType').value = tx.type;
+      document.getElementById('editTxOriginalAmount').value = tx.amount;
+      document.getElementById('editAmountInput').value = tx.amount;
+      document.getElementById('editDescInput').value = tx.description || '';
+      
+      document.getElementById('editModal').classList.add('active');
+    };
+    
+    window.closeEditModal = function() {
+      document.getElementById('editModal').classList.remove('active');
+    };
+    
+    window.saveTransactionEdit = async function() {
+      const txId = document.getElementById('editTxId').value;
+      const txType = document.getElementById('editTxType').value;
+      const originalAmount = parseFloat(document.getElementById('editTxOriginalAmount').value);
+      const newAmount = parseFloat(document.getElementById('editAmountInput').value);
+      const newDesc = document.getElementById('editDescInput').value.trim();
+      
+      if (!newAmount || newAmount <= 0) {
+        showToast('Please enter a valid amount', 'error');
+        return;
+      }
+      
+      // Update transaction
+      await updateTransaction(txId, {
+        amount: newAmount,
+        description: newDesc
+      });
+      
+      // Adjust balance for the difference
+      const amountDiff = newAmount - originalAmount;
+      if (amountDiff !== 0) {
+        const isPositive = txType === 'deposit' || txType === 'interest' || txType === 'earned';
+        const balanceChange = isPositive ? amountDiff : -amountDiff;
+        
+        await updateWalletData({
+          balance: walletData.balance + balanceChange
+        });
+      }
+      
+      closeEditModal();
+      showToast('Transaction updated!', 'success');
+      
+      // Refresh
+      transactions = getLocalData('transactions', []);
+      renderTransactions();
+    };
+    
+    // Undo transaction (reverse its effect)
+    window.undoTransaction = async function(txId) {
+      const tx = transactions.find(t => t.id === txId);
+      if (!tx) return;
+      
+      if (!confirm(`Undo "${tx.description || tx.type}" for ${formatCurrency(tx.amount)}? This will reverse its effect on the balance.`)) {
+        return;
+      }
+      
+      const isPositive = tx.type === 'deposit' || tx.type === 'interest' || tx.type === 'earned';
+      
+      // Create reversal transaction
+      await addTransaction({
+        type: isPositive ? 'withdrawal' : 'deposit',
+        amount: tx.amount,
+        description: `Undo: ${tx.description || tx.type}`
+      });
+      
+      // Update balance
+      const balanceChange = isPositive ? -tx.amount : tx.amount;
+      const updates = {
+        balance: walletData.balance + balanceChange
+      };
+      
+      // Update totals
+      if (tx.type === 'deposit') {
+        updates.totalDeposits = Math.max(0, (walletData.totalDeposits || 0) - tx.amount);
+      } else if (tx.type === 'earned') {
+        updates.totalEarned = Math.max(0, (walletData.totalEarned || 0) - tx.amount);
+      } else if (tx.type === 'interest') {
+        updates.totalInterest = Math.max(0, (walletData.totalInterest || 0) - tx.amount);
+      } else if (tx.type === 'withdrawal') {
+        updates.totalSpent = Math.max(0, (walletData.totalSpent || 0) - tx.amount);
+      }
+      
+      await updateWalletData(updates);
+      
+      showToast('Transaction undone!', 'success');
+    };
+    
+    // Delete transaction
+    window.confirmDeleteTx = async function(txId) {
+      const tx = transactions.find(t => t.id === txId);
+      if (!tx) return;
+      
+      if (!confirm(`Delete "${tx.description || tx.type}"? This will NOT affect the balance.`)) {
+        return;
+      }
+      
+      await deleteTransaction(txId);
+      showToast('Transaction deleted', 'success');
+      
+      transactions = getLocalData('transactions', []);
+      renderTransactions();
+    };
+    
+    // Balance adjustment
+    window.openBalanceModal = function() {
+      document.getElementById('newBalanceInput').value = walletData?.balance || 0;
+      document.getElementById('balanceModal').classList.add('active');
+    };
+    
+    window.closeBalanceModal = function() {
+      document.getElementById('balanceModal').classList.remove('active');
+    };
+    
+    window.saveBalanceAdjust = async function() {
+      const newBalance = parseFloat(document.getElementById('newBalanceInput').value);
+      
+      if (isNaN(newBalance) || newBalance < 0) {
+        showToast('Please enter a valid balance', 'error');
+        return;
+      }
+      
+      const currentBalance = walletData?.balance || 0;
+      const diff = newBalance - currentBalance;
+      
+      if (diff === 0) {
+        closeBalanceModal();
+        return;
+      }
+      
+      // Create adjustment transaction
+      await addTransaction({
+        type: diff > 0 ? 'deposit' : 'withdrawal',
+        amount: Math.abs(diff),
+        description: 'Balance adjustment'
+      });
+      
+      // Update balance
+      await updateWalletData({
+        balance: newBalance
+      });
+      
+      closeBalanceModal();
+      showToast('Balance adjusted!', 'success');
+    };
+    
+    // Reset all data
+    window.confirmResetAll = async function() {
+      if (!confirm('Are you sure you want to reset ALL data? This cannot be undone!')) {
+        return;
+      }
+      
+      if (!confirm('REALLY delete everything? All transactions, balance, and settings will be lost!')) {
+        return;
+      }
+      
+      // Reset wallet data
+      await updateWalletData({
+        balance: 0,
+        totalDeposits: 0,
+        totalSpent: 0,
+        totalEarned: 0,
+        totalInterest: 0,
+        settings: {
+          interestRate: 5,
+          interestDay: 1,
+          lastInterestDate: null,
+          parentPin: walletData?.settings?.parentPin, // Keep parent PIN
+          kidPin: null,
+          allowanceAmount: 5,
+          allowanceFrequency: 'biweekly',
+          lastAllowanceDate: null
+        }
+      });
+      
+      // Delete all transactions (would need to implement batch delete)
+      // For now, just clear local storage
+      localStorage.removeItem('kidswallet_transactions');
+      
+      showToast('All data reset!', 'success');
+      
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    };
+  </script>
+</body>
+</html>

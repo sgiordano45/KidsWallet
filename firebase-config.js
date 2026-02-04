@@ -1,3 +1,6 @@
+// KidsWallet Firebase Configuration
+// https://console.firebase.google.com/project/kidswallet-406a6
+
 export const firebaseConfig = {
   apiKey: "AIzaSyAavO4IE21FEwBeY7fuFdBFYc9dflpLk90",
   authDomain: "kidswallet-406a6.firebaseapp.com",
