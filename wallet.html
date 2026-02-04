@@ -347,12 +347,38 @@
       filter: brightness(1.1);
     }
     
+    .secondary-btn {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .secondary-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+    
     /* PIN Input */
     .pin-container {
       display: flex;
       justify-content: center;
       gap: var(--space-md);
       margin: var(--space-xl) 0;
+    }
+    
+    .pin-subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: calc(-1 * var(--space-md));
+      margin-bottom: var(--space-sm);
     }
     
     .pin-dot {
@@ -476,7 +502,7 @@
     </div>
     
     <!-- I Earned It Button -->
-    <button class="action-btn action-btn-earned" onclick="openModal('earned')">
+    <button class="action-btn action-btn-earned" onclick="handleEarnedClick()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
       </svg>
@@ -516,7 +542,7 @@
     </div>
   </div>
   
-  <!-- PIN Modal -->
+  <!-- PIN Modal (Parent) -->
   <div class="modal-overlay" id="pinModal">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -540,6 +566,35 @@
         <button class="pin-key" onclick="closePinModal()">✕</button>
         <button class="pin-key" onclick="enterPin(0)">0</button>
         <button class="pin-key backspace" onclick="deletePin()">⌫</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Kid PIN Modal -->
+  <div class="modal-overlay" id="kidPinModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title" id="kidPinTitle">Enter Your PIN</h2>
+      <p class="pin-subtitle" id="kidPinSubtitle">Enter your secret PIN to continue</p>
+      <div class="pin-container">
+        <div class="pin-dot" id="kidPin1"></div>
+        <div class="pin-dot" id="kidPin2"></div>
+        <div class="pin-dot" id="kidPin3"></div>
+        <div class="pin-dot" id="kidPin4"></div>
+      </div>
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="enterKidPin(1)">1</button>
+        <button class="pin-key" onclick="enterKidPin(2)">2</button>
+        <button class="pin-key" onclick="enterKidPin(3)">3</button>
+        <button class="pin-key" onclick="enterKidPin(4)">4</button>
+        <button class="pin-key" onclick="enterKidPin(5)">5</button>
+        <button class="pin-key" onclick="enterKidPin(6)">6</button>
+        <button class="pin-key" onclick="enterKidPin(7)">7</button>
+        <button class="pin-key" onclick="enterKidPin(8)">8</button>
+        <button class="pin-key" onclick="enterKidPin(9)">9</button>
+        <button class="pin-key" onclick="closeKidPinModal()">✕</button>
+        <button class="pin-key" onclick="enterKidPin(0)">0</button>
+        <button class="pin-key backspace" onclick="deleteKidPin()">⌫</button>
       </div>
     </div>
   </div>
@@ -588,6 +643,15 @@
             <input type="password" class="settings-input" id="pinInput" maxlength="4" placeholder="****" inputmode="numeric">
           </div>
         </div>
+        <div class="settings-item">
+          <div>
+            <p class="settings-label">Kid's PIN</p>
+            <p class="settings-sublabel" id="kidPinStatus">Not set yet</p>
+          </div>
+          <div class="settings-value">
+            <button class="secondary-btn" id="resetKidPinBtn" onclick="resetKidPin()" style="display: none;">Reset</button>
+          </div>
+        </div>
       </div>
       
       <div class="settings-section">
@@ -631,6 +695,11 @@
     let currentModalType = 'deposit';
     let enteredPin = '';
     let pinAction = null;
+    
+    // Kid PIN state
+    let enteredKidPin = '';
+    let kidPinMode = 'verify'; // 'verify', 'setup', 'confirm'
+    let kidPinSetupValue = '';
     
     // DOM Elements
     const balanceAmountEl = document.getElementById('balanceAmount');
@@ -807,6 +876,18 @@
       document.getElementById('interestDayInput').value = settings.interestDay || 1;
       document.getElementById('pinInput').value = settings.parentPin || '';
       
+      // Show kid PIN info
+      const kidPinStatus = document.getElementById('kidPinStatus');
+      const resetKidPinBtn = document.getElementById('resetKidPinBtn');
+      
+      if (settings.kidPin) {
+        kidPinStatus.textContent = `Currently: ${settings.kidPin}`;
+        resetKidPinBtn.style.display = 'block';
+      } else {
+        kidPinStatus.textContent = 'Not set yet';
+        resetKidPinBtn.style.display = 'none';
+      }
+      
       modal.classList.add('active');
     }
     
@@ -833,6 +914,20 @@
           localStorage.clear();
           location.reload();
         }
+      }
+    };
+    
+    window.resetKidPin = async function() {
+      if (confirm('Reset kid\'s PIN? They\'ll need to create a new one.')) {
+        await updateWalletData({
+          settings: {
+            ...walletData.settings,
+            kidPin: null
+          }
+        });
+        document.getElementById('kidPinStatus').textContent = 'Not set yet';
+        document.getElementById('resetKidPinBtn').style.display = 'none';
+        showToast('Kid PIN reset!', 'success');
       }
     };
     
@@ -876,6 +971,101 @@
         showToast('Wrong PIN!', 'error');
         enteredPin = '';
         updatePinDots();
+      }
+    }
+    
+    // Kid PIN Functions
+    window.handleEarnedClick = function() {
+      const kidPin = walletData?.settings?.kidPin;
+      if (!kidPin) {
+        // No PIN set - start setup flow
+        kidPinMode = 'setup';
+        kidPinSetupValue = '';
+        document.getElementById('kidPinTitle').textContent = 'Create Your PIN 🔐';
+        document.getElementById('kidPinSubtitle').textContent = 'Pick 4 numbers you\'ll remember!';
+      } else {
+        // PIN exists - verify it
+        kidPinMode = 'verify';
+        document.getElementById('kidPinTitle').textContent = 'Enter Your PIN';
+        document.getElementById('kidPinSubtitle').textContent = 'Enter your secret PIN to continue';
+      }
+      enteredKidPin = '';
+      updateKidPinDots();
+      document.getElementById('kidPinModal').classList.add('active');
+    };
+    
+    window.enterKidPin = function(num) {
+      if (enteredKidPin.length >= 4) return;
+      enteredKidPin += num;
+      updateKidPinDots();
+      
+      if (enteredKidPin.length === 4) {
+        setTimeout(processKidPin, 200);
+      }
+    };
+    
+    window.deleteKidPin = function() {
+      enteredKidPin = enteredKidPin.slice(0, -1);
+      updateKidPinDots();
+    };
+    
+    window.closeKidPinModal = function() {
+      document.getElementById('kidPinModal').classList.remove('active');
+      enteredKidPin = '';
+      kidPinSetupValue = '';
+      updateKidPinDots();
+    };
+    
+    function updateKidPinDots() {
+      for (let i = 1; i <= 4; i++) {
+        const dot = document.getElementById(`kidPin${i}`);
+        dot.classList.toggle('filled', i <= enteredKidPin.length);
+      }
+    }
+    
+    async function processKidPin() {
+      if (kidPinMode === 'setup') {
+        // First time entering - save and ask to confirm
+        kidPinSetupValue = enteredKidPin;
+        kidPinMode = 'confirm';
+        enteredKidPin = '';
+        updateKidPinDots();
+        document.getElementById('kidPinTitle').textContent = 'Confirm Your PIN';
+        document.getElementById('kidPinSubtitle').textContent = 'Enter the same PIN again';
+      } else if (kidPinMode === 'confirm') {
+        // Confirming setup
+        if (enteredKidPin === kidPinSetupValue) {
+          // Save the PIN
+          await updateWalletData({
+            settings: {
+              ...walletData.settings,
+              kidPin: enteredKidPin
+            }
+          });
+          closeKidPinModal();
+          showToast('PIN created! 🎉', 'success');
+          // Now open the earned modal
+          openModal('earned');
+        } else {
+          showToast('PINs don\'t match! Try again', 'error');
+          kidPinMode = 'setup';
+          kidPinSetupValue = '';
+          enteredKidPin = '';
+          updateKidPinDots();
+          document.getElementById('kidPinTitle').textContent = 'Create Your PIN 🔐';
+          document.getElementById('kidPinSubtitle').textContent = 'Pick 4 numbers you\'ll remember!';
+        }
+      } else {
+        // Verify mode
+        const correctPin = walletData?.settings?.kidPin;
+        if (enteredKidPin === correctPin) {
+          closeKidPinModal();
+          openModal('earned');
+        } else {
+          showToast('Wrong PIN!', 'error');
+          enteredKidPin = '';
+          updateKidPinDots();
+        }
       }
     }
     
