@@ -101,7 +101,21 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    
+    .action-btn-earned {
+      width: 100%;
       margin-bottom: var(--space-xl);
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 180, 0, 0.1) 100%);
+      border: 2px solid var(--accent-gold);
+      color: var(--accent-gold);
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+    }
+    
+    .action-btn-earned:hover {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.25) 0%, rgba(255, 180, 0, 0.2) 100%);
+      box-shadow: var(--shadow-glow-gold);
     }
     
     .action-btn {
@@ -212,6 +226,11 @@
     }
     
     .transaction-icon.interest {
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--accent-gold);
+    }
+    
+    .transaction-icon.earned {
       background: rgba(255, 215, 0, 0.15);
       color: var(--accent-gold);
     }
@@ -389,6 +408,13 @@
       color: white;
       box-shadow: none;
     }
+    
+    .modal-btn.confirm.earned,
+    .btn-primary.earned {
+      background: var(--gradient-gold);
+      color: #000;
+      box-shadow: var(--shadow-glow-gold);
+    }
   </style>
 </head>
 <body>
@@ -420,15 +446,15 @@
     <!-- Stats Row -->
     <div class="stats-row stagger-children">
       <div class="stat-card">
-        <p class="stat-value positive" id="totalDeposits">$0</p>
-        <p class="stat-label">Deposits</p>
+        <p class="stat-value gold" id="totalEarned">$0</p>
+        <p class="stat-label">Earned</p>
       </div>
       <div class="stat-card">
         <p class="stat-value negative" id="totalSpent">$0</p>
         <p class="stat-label">Spent</p>
       </div>
       <div class="stat-card">
-        <p class="stat-value gold" id="totalInterest">$0</p>
+        <p class="stat-value positive" id="totalInterest">$0</p>
         <p class="stat-label">Interest</p>
       </div>
     </div>
@@ -448,6 +474,14 @@
         Spend
       </button>
     </div>
+    
+    <!-- I Earned It Button -->
+    <button class="action-btn action-btn-earned" onclick="openModal('earned')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+      </svg>
+      I Earned It!
+    </button>
     
     <!-- Transactions -->
     <div class="section-header">
@@ -600,7 +634,7 @@
     
     // DOM Elements
     const balanceAmountEl = document.getElementById('balanceAmount');
-    const totalDepositsEl = document.getElementById('totalDeposits');
+    const totalEarnedEl = document.getElementById('totalEarned');
     const totalSpentEl = document.getElementById('totalSpent');
     const totalInterestEl = document.getElementById('totalInterest');
     const transactionsListEl = document.getElementById('transactionsList');
@@ -615,7 +649,7 @@
       setTimeout(() => balanceAmountEl.classList.remove('updating'), 150);
       
       // Stats
-      totalDepositsEl.textContent = formatCurrency(walletData.totalDeposits || 0);
+      totalEarnedEl.textContent = formatCurrency(walletData.totalEarned || 0);
       totalSpentEl.textContent = formatCurrency(walletData.totalSpent || 0);
       totalInterestEl.textContent = formatCurrency(walletData.totalInterest || 0);
     }
@@ -634,11 +668,12 @@
       
       transactionsListEl.innerHTML = transactions.slice(0, 20).map(tx => {
         const iconClass = tx.type === 'deposit' ? 'deposit' : 
-                          tx.type === 'interest' ? 'interest' : 'withdrawal';
+                          tx.type === 'interest' ? 'interest' : 
+                          tx.type === 'earned' ? 'earned' : 'withdrawal';
         
         const icon = tx.type === 'deposit' ? 
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg>' :
-          tx.type === 'interest' ?
+          (tx.type === 'interest' || tx.type === 'earned') ?
           '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>' :
           '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
         
@@ -669,12 +704,19 @@
       if (type === 'deposit') {
         title.textContent = 'Add Money';
         confirmBtn.textContent = 'Add';
-        confirmBtn.classList.remove('withdrawal');
+        confirmBtn.classList.remove('withdrawal', 'earned');
         descInput.placeholder = 'e.g., Allowance, Birthday gift...';
+      } else if (type === 'earned') {
+        title.textContent = 'I Earned It! 🌟';
+        confirmBtn.textContent = 'Add Earnings';
+        confirmBtn.classList.remove('withdrawal');
+        confirmBtn.classList.add('earned');
+        descInput.placeholder = 'e.g., Chores, Helped neighbor, Lemonade stand...';
       } else {
         title.textContent = 'Spend Money';
         confirmBtn.textContent = 'Spend';
         confirmBtn.classList.add('withdrawal');
+        confirmBtn.classList.remove('earned');
         descInput.placeholder = 'e.g., Toy, Game, Candy...';
       }
       
@@ -694,7 +736,8 @@
     window.confirmTransaction = async function() {
       const amount = parseFloat(document.getElementById('amountInput').value);
       const description = document.getElementById('descriptionInput').value.trim() || 
-        (currentModalType === 'deposit' ? 'Deposit' : 'Purchase');
+        (currentModalType === 'deposit' ? 'Deposit' : 
+         currentModalType === 'earned' ? 'Earned' : 'Purchase');
       
       if (!amount || amount <= 0) {
         showToast('Please enter a valid amount', 'error');
@@ -706,28 +749,43 @@
         return;
       }
       
+      // Treat 'earned' as a deposit type for the transaction
+      const transactionType = currentModalType === 'earned' ? 'earned' : currentModalType;
+      
       // Add transaction
       await addTransaction({
-        type: currentModalType,
+        type: transactionType,
         amount: amount,
         description: description
       });
       
-      // Update wallet
-      const newBalance = currentModalType === 'deposit' 
+      // Update wallet - earned and deposit both add money
+      const isAddingMoney = currentModalType === 'deposit' || currentModalType === 'earned';
+      const newBalance = isAddingMoney 
         ? (walletData.balance || 0) + amount
         : (walletData.balance || 0) - amount;
       
       const updates = {
-        balance: newBalance,
-        [currentModalType === 'deposit' ? 'totalDeposits' : 'totalSpent']: 
-          (walletData[currentModalType === 'deposit' ? 'totalDeposits' : 'totalSpent'] || 0) + amount
+        balance: newBalance
       };
+      
+      if (currentModalType === 'deposit') {
+        updates.totalDeposits = (walletData.totalDeposits || 0) + amount;
+      } else if (currentModalType === 'earned') {
+        updates.totalEarned = (walletData.totalEarned || 0) + amount;
+      } else {
+        updates.totalSpent = (walletData.totalSpent || 0) + amount;
+      }
       
       await updateWalletData(updates);
       
       closeModal();
-      showToast(currentModalType === 'deposit' ? 'Money added!' : 'Purchase recorded!', 'success');
+      const messages = {
+        deposit: 'Money added!',
+        earned: 'Great job earning money! 🌟',
+        withdrawal: 'Purchase recorded!'
+      };
+      showToast(messages[currentModalType], 'success');
     };
     
     // Settings

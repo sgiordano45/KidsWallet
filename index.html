@@ -310,7 +310,7 @@
           </svg>
         </div>
         <h2 class="tile-title">My Wallet</h2>
-        <p class="tile-desc">Track spending and deposits</p>
+        <p class="tile-desc">Track earnings and spending</p>
         <div class="tile-stat">
           <span id="walletStat">Loading...</span>
         </div>
@@ -386,11 +386,11 @@
     
     // Update Wallet Stats
     function updateWalletStats(wallet) {
-      const interestEarned = wallet?.totalInterest || 0;
-      if (interestEarned > 0) {
-        walletStatEl.innerHTML = `<strong>${formatCurrency(interestEarned)}</strong> interest earned`;
+      const earned = wallet?.totalEarned || 0;
+      if (earned > 0) {
+        walletStatEl.innerHTML = `<strong>${formatCurrency(earned)}</strong> earned so far`;
       } else {
-        walletStatEl.textContent = 'Start earning interest!';
+        walletStatEl.textContent = 'Start earning money!';
       }
     }
     
