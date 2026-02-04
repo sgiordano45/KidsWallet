@@ -1,15 +1,19 @@
 // KidsWallet Service Worker
-const CACHE_NAME = 'kidswallet-v2';
+const CACHE_NAME = 'kidswallet-v3';
+const BASE_PATH = '/KidsWallet';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/wallet.html',
-  '/goals.html',
-  '/shared.css',
-  '/shared.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/wallet.html`,
+  `${BASE_PATH}/goals.html`,
+  `${BASE_PATH}/admin.html`,
+  `${BASE_PATH}/setup.html`,
+  `${BASE_PATH}/shared.css`,
+  `${BASE_PATH}/shared.js`,
+  `${BASE_PATH}/firebase-config.js`,
+  `${BASE_PATH}/manifest.json`,
+  `${BASE_PATH}/icons/icon-192.png`,
+  `${BASE_PATH}/icons/icon-512.png`
 ];
 
 // Install event - cache assets
@@ -46,9 +50,10 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   
   // Skip Firebase requests
-  if (event.request.url.includes('firestore') || 
+  if (event.request.url.includes('firestore') ||
       event.request.url.includes('firebase') ||
-      event.request.url.includes('gstatic')) {
+      event.request.url.includes('gstatic') ||
+      event.request.url.includes('googleapis')) {
     return;
   }
   
@@ -80,7 +85,7 @@ self.addEventListener('fetch', (event) => {
       .catch(() => {
         // Return fallback for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          return caches.match(`${BASE_PATH}/index.html`);
         }
       })
   );
