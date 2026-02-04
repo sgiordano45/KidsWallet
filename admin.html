@@ -572,6 +572,69 @@
     .edit-modal .modal {
       border-top-color: var(--accent-blue);
     }
+    
+    /* Wallets List */
+    .wallets-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .wallet-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    
+    .wallet-item.current {
+      border-color: var(--accent-primary);
+      background: rgba(0, 184, 169, 0.05);
+    }
+    
+    .wallet-item-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 184, 169, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+    }
+    
+    .wallet-item-info {
+      flex: 1;
+    }
+    
+    .wallet-item-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+    }
+    
+    .wallet-item-balance {
+      font-size: 0.875rem;
+      color: var(--accent-primary);
+      font-weight: 600;
+    }
+    
+    .wallet-item-badge {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      background: var(--accent-primary);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+    }
+    
+    .wallet-item-actions {
+      display: flex;
+      gap: var(--space-xs);
+    }
   </style>
 </head>
 <body>
@@ -638,7 +701,35 @@
         </svg>
       </div>
       <h2 class="admin-hero-title">Parent Dashboard</h2>
-      <p class="admin-hero-subtitle">Manage your child's wallet and settings</p>
+      <p class="admin-hero-subtitle">Managing: <strong id="currentWalletName">Loading...</strong></p>
+    </div>
+    
+    <!-- Wallet Management -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <div class="admin-section-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </div>
+        <h2 class="admin-section-title">Children's Wallets</h2>
+      </div>
+      
+      <div class="admin-card">
+        <div id="walletsList" class="wallets-list">
+          <!-- Wallets loaded dynamically -->
+        </div>
+        
+        <button class="btn btn-secondary btn-full mt-md" onclick="openAddChildModal()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 8v8M8 12h8"/>
+          </svg>
+          Add Another Child
+        </button>
+      </div>
     </div>
     
     <!-- Quick Stats -->
@@ -879,6 +970,26 @@
     </div>
   </div>
   
+  <!-- Add Child Modal -->
+  <div class="modal-overlay" id="addChildModal">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h2 class="modal-title">Add Another Child</h2>
+      
+      <div class="form-group">
+        <label class="form-label">Child's Name</label>
+        <input type="text" class="form-input" id="newChildName" placeholder="Enter name" autocapitalize="words">
+      </div>
+      
+      <p class="form-hint">This creates a new wallet. To use it, sign in on another iPad and select this wallet during setup.</p>
+      
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeAddChildModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="addChild()">Create Wallet</button>
+      </div>
+    </div>
+  </div>
+  
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
@@ -893,6 +1004,12 @@
       updateTransaction,
       deleteTransaction,
       addTransaction,
+      listWallets,
+      createWallet,
+      getWalletInfo,
+      getSelectedWalletId,
+      setSelectedWalletId,
+      getCurrentWalletId,
       formatCurrency,
       formatDateTime,
       showToast,
@@ -902,6 +1019,7 @@
     // State
     let walletData = null;
     let transactions = [];
+    let allWallets = [];
     let currentFilter = 'all';
     let enteredPin = '';
     let pinVerified = false;
@@ -927,6 +1045,9 @@
     
     // Initialize admin page
     async function initAdmin() {
+      // Load all wallets first
+      await loadWallets();
+      
       // Subscribe to wallet updates
       subscribeToWallet((data) => {
         walletData = data;
@@ -948,6 +1069,72 @@
         renderTransactions();
       });
     }
+    
+    // Load all wallets
+    async function loadWallets() {
+      allWallets = await listWallets();
+      renderWallets();
+    }
+    
+    // Render wallets list
+    function renderWallets() {
+      const list = document.getElementById('walletsList');
+      const currentId = getSelectedWalletId();
+      
+      if (allWallets.length === 0) {
+        list.innerHTML = '<p class="text-muted text-center">No wallets found</p>';
+        return;
+      }
+      
+      // Update current wallet name in hero
+      const currentWallet = allWallets.find(w => w.id === currentId);
+      document.getElementById('currentWalletName').textContent = currentWallet?.childName || currentWallet?.name || 'Unknown';
+      
+      list.innerHTML = allWallets.map(w => {
+        const isCurrent = w.id === currentId;
+        return `
+          <div class="wallet-item ${isCurrent ? 'current' : ''}">
+            <div class="wallet-item-icon">👦</div>
+            <div class="wallet-item-info">
+              <p class="wallet-item-name">${w.childName || w.name}</p>
+              <p class="wallet-item-balance">${formatCurrency(w.balance || 0)}</p>
+            </div>
+            ${isCurrent ? '<span class="wallet-item-badge">This iPad</span>' : ''}
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // Add child modal
+    window.openAddChildModal = function() {
+      document.getElementById('newChildName').value = '';
+      document.getElementById('addChildModal').classList.add('active');
+      setTimeout(() => document.getElementById('newChildName').focus(), 300);
+    };
+    
+    window.closeAddChildModal = function() {
+      document.getElementById('addChildModal').classList.remove('active');
+    };
+    
+    window.addChild = async function() {
+      const name = document.getElementById('newChildName').value.trim();
+      if (!name) {
+        showToast('Please enter a name', 'error');
+        return;
+      }
+      
+      loadingOverlay.classList.remove('hidden');
+      const walletId = await createWallet(name);
+      loadingOverlay.classList.add('hidden');
+      
+      if (walletId) {
+        closeAddChildModal();
+        showToast(`${name}'s wallet created!`, 'success');
+        await loadWallets();
+      } else {
+        showToast('Failed to create wallet', 'error');
+      }
+    };
     
     // Update UI with wallet data
     function updateUI() {

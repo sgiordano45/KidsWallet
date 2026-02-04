@@ -432,6 +432,7 @@
       signInWithGoogle,
       signOutUser,
       getCurrentUser,
+      needsSetup,
       getWalletData, 
       subscribeToWallet,
       subscribeToGoals,
@@ -511,6 +512,12 @@
     
     // Update UI for authenticated user
     function showAuthenticatedUI(user) {
+      // Check if this device needs setup (no wallet selected)
+      if (needsSetup()) {
+        window.location.href = 'setup.html';
+        return;
+      }
+      
       authScreen.classList.add('hidden');
       mainApp.style.display = 'block';
       

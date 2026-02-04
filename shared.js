@@ -37,7 +37,7 @@ let app, db, auth;
 let useFirebase = false;
 let currentUser = null;
 let familyId = null;
-let walletId = 'main'; // Default wallet within family
+let walletId = null; // Set by device localStorage or setup flow
 
 // Auth state callbacks
 const authCallbacks = [];
@@ -138,16 +138,22 @@ if (useFirebase) {
       currentUser = user;
       familyId = user.uid; // Family ID = user's UID
       
+      // Load wallet selection for this device
+      walletId = getSelectedWalletId();
+      
       // Ensure family document exists
       await ensureFamilyExists(user);
       
-      // Check for data migration
-      await migrateOldData(user);
+      // Check for data migration (only if wallet selected)
+      if (walletId) {
+        await migrateOldData(user);
+      }
       
-      console.log('User signed in:', user.email);
+      console.log('User signed in:', user.email, 'Wallet:', walletId || 'none selected');
     } else {
       currentUser = null;
       familyId = null;
+      walletId = null;
       console.log('User signed out');
     }
     notifyAuthCallbacks(currentUser);
@@ -166,7 +172,7 @@ async function ensureFamilyExists(user) {
     const familySnap = await getDoc(familyRef);
     
     if (!familySnap.exists()) {
-      // Create new family
+      // Create new family document (but no default wallet - setup flow handles that)
       await setDoc(familyRef, {
         ownerUid: user.uid,
         ownerEmail: user.email,
@@ -175,29 +181,6 @@ async function ensureFamilyExists(user) {
         createdAt: serverTimestamp()
       });
       console.log('Created new family');
-      
-      // Create default wallet
-      const walletRef = doc(db, 'families', user.uid, 'wallets', 'main');
-      await setDoc(walletRef, {
-        name: 'Main Wallet',
-        balance: 0,
-        totalDeposits: 0,
-        totalSpent: 0,
-        totalEarned: 0,
-        totalInterest: 0,
-        settings: {
-          interestRate: 5,
-          interestDay: 1,
-          lastInterestDate: null,
-          parentPin: null,
-          kidPin: null,
-          allowanceAmount: 5,
-          allowanceFrequency: 'biweekly',
-          lastAllowanceDate: null
-        },
-        createdAt: serverTimestamp()
-      });
-      console.log('Created default wallet');
     }
   } catch (error) {
     console.error('Error ensuring family exists:', error);
@@ -205,7 +188,7 @@ async function ensureFamilyExists(user) {
 }
 
 async function migrateOldData(user) {
-  if (!useFirebase || !user) return;
+  if (!useFirebase || !user || !walletId) return;
   
   try {
     // Check if old data exists at wallets/main_wallet
@@ -216,12 +199,13 @@ async function migrateOldData(user) {
       console.log('Found old data, migrating...');
       
       const oldData = oldWalletSnap.data();
-      const newWalletRef = doc(db, 'families', user.uid, 'wallets', 'main');
+      const newWalletRef = doc(db, 'families', user.uid, 'wallets', walletId);
       
-      // Check if new location already has data
+      // Check if new location already has data with balance
       const newWalletSnap = await getDoc(newWalletRef);
+      const newData = newWalletSnap.exists() ? newWalletSnap.data() : null;
       
-      if (!newWalletSnap.exists() || newWalletSnap.data().balance === 0) {
+      if (!newData || (newData.balance === 0 && oldData.balance > 0)) {
         // Migrate wallet data
         await setDoc(newWalletRef, {
           ...oldData,
@@ -235,29 +219,29 @@ async function migrateOldData(user) {
         );
         const oldTxSnap = await getDocs(oldTxQuery);
         
-        const batch = writeBatch(db);
-        oldTxSnap.forEach((txDoc) => {
-          const newTxRef = doc(db, 'families', user.uid, 'wallets', 'main', 'transactions', txDoc.id);
-          batch.set(newTxRef, txDoc.data());
-        });
+        if (oldTxSnap.size > 0) {
+          const batch = writeBatch(db);
+          oldTxSnap.forEach((txDoc) => {
+            const newTxRef = doc(db, 'families', user.uid, 'wallets', walletId, 'transactions', txDoc.id);
+            batch.set(newTxRef, txDoc.data());
+          });
+          
+          // Migrate goals
+          const oldGoalsQuery = query(
+            collection(db, 'wallets', 'main_wallet', 'goals'),
+            orderBy('createdAt', 'desc')
+          );
+          const oldGoalsSnap = await getDocs(oldGoalsQuery);
+          
+          oldGoalsSnap.forEach((goalDoc) => {
+            const newGoalRef = doc(db, 'families', user.uid, 'wallets', walletId, 'goals', goalDoc.id);
+            batch.set(newGoalRef, goalDoc.data());
+          });
+          
+          await batch.commit();
+        }
         
-        // Migrate goals
-        const oldGoalsQuery = query(
-          collection(db, 'wallets', 'main_wallet', 'goals'),
-          orderBy('createdAt', 'desc')
-        );
-        const oldGoalsSnap = await getDocs(oldGoalsQuery);
-        
-        oldGoalsSnap.forEach((goalDoc) => {
-          const newGoalRef = doc(db, 'families', user.uid, 'wallets', 'main', 'goals', goalDoc.id);
-          batch.set(newGoalRef, goalDoc.data());
-        });
-        
-        await batch.commit();
         console.log('Migration complete');
-        
-        // Optionally delete old data (commented out for safety)
-        // await deleteDoc(oldWalletRef);
       }
     }
   } catch (error) {
@@ -286,6 +270,136 @@ export async function updateFamilyInfo(updates) {
     await updateDoc(familyRef, updates);
   } catch (error) {
     console.error('Error updating family info:', error);
+  }
+}
+
+// ============================================
+// WALLET MANAGEMENT (Multi-child support)
+// ============================================
+
+// Get the wallet ID selected for THIS device
+export function getSelectedWalletId() {
+  try {
+    return localStorage.getItem('kidswallet_selected_wallet') || null;
+  } catch {
+    return null;
+  }
+}
+
+// Set the wallet ID for THIS device
+export function setSelectedWalletId(id) {
+  try {
+    localStorage.setItem('kidswallet_selected_wallet', id);
+    walletId = id;
+  } catch (error) {
+    console.error('Failed to save wallet selection:', error);
+  }
+}
+
+// Check if this device needs setup (no wallet selected)
+export function needsSetup() {
+  return !getSelectedWalletId();
+}
+
+// Get current wallet ID
+export function getCurrentWalletId() {
+  return walletId;
+}
+
+// List all wallets for this family
+export async function listWallets() {
+  if (!useFirebase || !familyId) return [];
+  
+  try {
+    const walletsRef = collection(db, 'families', familyId, 'wallets');
+    const snapshot = await getDocs(walletsRef);
+    const wallets = [];
+    snapshot.forEach(doc => {
+      wallets.push({ id: doc.id, ...doc.data() });
+    });
+    return wallets;
+  } catch (error) {
+    console.error('Error listing wallets:', error);
+    return [];
+  }
+}
+
+// Create a new wallet for a child
+export async function createWallet(childName) {
+  if (!useFirebase || !familyId) return null;
+  
+  // Create URL-friendly ID from name
+  const id = childName.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 20);
+  
+  try {
+    const walletRef = doc(db, 'families', familyId, 'wallets', id);
+    const existingSnap = await getDoc(walletRef);
+    
+    if (existingSnap.exists()) {
+      // Wallet already exists, just return the ID
+      return id;
+    }
+    
+    await setDoc(walletRef, {
+      name: childName,
+      childName: childName,
+      balance: 0,
+      totalDeposits: 0,
+      totalSpent: 0,
+      totalEarned: 0,
+      totalInterest: 0,
+      settings: {
+        interestRate: 5,
+        interestDay: 1,
+        lastInterestDate: null,
+        parentPin: null,
+        kidPin: null,
+        allowanceAmount: 5,
+        allowanceFrequency: 'biweekly',
+        lastAllowanceDate: null
+      },
+      createdAt: serverTimestamp()
+    });
+    
+    console.log('Created wallet:', id);
+    return id;
+  } catch (error) {
+    console.error('Error creating wallet:', error);
+    return null;
+  }
+}
+
+// Get wallet info by ID
+export async function getWalletInfo(id) {
+  if (!useFirebase || !familyId) return null;
+  
+  try {
+    const walletRef = doc(db, 'families', familyId, 'wallets', id);
+    const walletSnap = await getDoc(walletRef);
+    return walletSnap.exists() ? { id: walletSnap.id, ...walletSnap.data() } : null;
+  } catch (error) {
+    console.error('Error getting wallet info:', error);
+    return null;
+  }
+}
+
+// Trigger migration after wallet selection (called from setup flow)
+export async function triggerMigration() {
+  if (currentUser && walletId) {
+    await migrateOldData(currentUser);
+  }
+}
+
+// Check if old data exists that could be migrated
+export async function hasOldDataToMigrate() {
+  if (!useFirebase) return false;
+  
+  try {
+    const oldWalletRef = doc(db, 'wallets', 'main_wallet');
+    const oldWalletSnap = await getDoc(oldWalletRef);
+    return oldWalletSnap.exists() && (oldWalletSnap.data().balance > 0);
+  } catch (error) {
+    return false;
   }
 }
 

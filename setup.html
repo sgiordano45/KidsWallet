@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#f0f7ff">
+  <title>Setup - KidsWallet</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .setup-container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-lg);
+      padding-top: calc(var(--safe-top) + var(--space-xl));
+      padding-bottom: calc(var(--safe-bottom) + var(--space-xl));
+    }
+    
+    .setup-step {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .setup-step.active {
+      display: flex;
+    }
+    
+    .setup-header {
+      text-align: center;
+      margin-bottom: var(--space-2xl);
+    }
+    
+    .setup-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto var(--space-lg);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+    
+    .setup-icon.primary {
+      background: var(--gradient-primary);
+      color: #fff;
+    }
+    
+    .setup-icon.primary svg {
+      width: 56px;
+      height: 56px;
+    }
+    
+    .setup-icon.gold {
+      background: var(--card-gold);
+      border: 2px solid rgba(245, 158, 11, 0.3);
+    }
+    
+    .setup-icon.purple {
+      background: rgba(167, 139, 250, 0.15);
+      border: 2px solid rgba(167, 139, 250, 0.3);
+    }
+    
+    .setup-icon.green {
+      background: rgba(52, 211, 153, 0.15);
+      border: 2px solid rgba(52, 211, 153, 0.3);
+    }
+    
+    .setup-title {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .setup-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    
+    .setup-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    
+    .setup-form {
+      max-width: 400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    .child-name-input {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      border: 2px solid rgba(0, 184, 169, 0.2);
+      color: var(--text-primary);
+      width: 100%;
+      transition: all var(--transition-fast);
+    }
+    
+    .child-name-input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 4px var(--accent-primary-glow);
+    }
+    
+    .child-name-input::placeholder {
+      color: var(--text-muted);
+    }
+    
+    .setup-actions {
+      margin-top: auto;
+      padding-top: var(--space-xl);
+    }
+    
+    .setup-btn {
+      width: 100%;
+      padding: var(--space-lg);
+      font-size: 1.1rem;
+    }
+    
+    .setup-btn-secondary {
+      margin-top: var(--space-md);
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      box-shadow: none;
+    }
+    
+    .setup-btn-secondary:hover {
+      color: var(--accent-primary);
+      background: transparent;
+    }
+    
+    /* Existing Wallets */
+    .existing-wallets {
+      margin-bottom: var(--space-xl);
+    }
+    
+    .existing-wallets-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-md);
+      text-align: center;
+    }
+    
+    .wallet-option {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+      background: var(--bg-card);
+      border: 2px solid rgba(0, 184, 169, 0.1);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .wallet-option:hover {
+      border-color: var(--accent-primary);
+      background: var(--bg-elevated);
+    }
+    
+    .wallet-option-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: rgba(0, 184, 169, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .wallet-option-info {
+      flex: 1;
+    }
+    
+    .wallet-option-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    
+    .wallet-option-balance {
+      font-size: 0.875rem;
+      color: var(--accent-primary);
+      font-weight: 600;
+    }
+    
+    .wallet-option-arrow {
+      color: var(--text-muted);
+    }
+    
+    .wallet-option-arrow svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+    
+    /* PIN Setup */
+    .pin-setup {
+      text-align: center;
+    }
+    
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .pin-dot {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-full);
+      background: var(--bg-elevated);
+      border: 2px solid rgba(0, 184, 169, 0.3);
+      transition: all var(--transition-fast);
+    }
+    
+    .pin-dot.filled {
+      background: var(--accent-purple);
+      border-color: var(--accent-purple);
+      box-shadow: var(--shadow-glow-purple);
+    }
+    
+    .pin-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    
+    .pin-key {
+      height: 64px;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 2px solid rgba(0, 184, 169, 0.1);
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    
+    .pin-key:hover {
+      background: var(--bg-elevated);
+      border-color: var(--accent-primary);
+    }
+    
+    .pin-key:active {
+      transform: scale(0.95);
+    }
+    
+    .pin-key.action {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    
+    .pin-key.action:hover {
+      color: var(--accent-primary);
+    }
+    
+    .pin-key svg {
+      width: 24px;
+      height: 24px;
+    }
+    
+    /* Success Animation */
+    .success-checkmark {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto var(--space-lg);
+      border-radius: var(--radius-full);
+      background: var(--gradient-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: scaleIn 0.4s ease, pulse 2s infinite 0.4s;
+    }
+    
+    .success-checkmark svg {
+      width: 40px;
+      height: 40px;
+      color: #fff;
+    }
+    
+    /* Loading */
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .loading-overlay.hidden {
+      display: none;
+    }
+    
+    /* Migration Notice */
+    .migration-notice {
+      background: var(--card-gold);
+      border: 2px solid rgba(245, 158, 11, 0.3);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      margin-bottom: var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .migration-notice-icon {
+      font-size: 1.5rem;
+    }
+    
+    .migration-notice-text {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+    
+    .migration-notice-text strong {
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+  </div>
+  
+  <div class="setup-container">
+    <!-- Step 1: Welcome / Select or Create Wallet -->
+    <div class="setup-step active" id="step1">
+      <div class="setup-header">
+        <div class="setup-icon primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/>
+            <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/>
+            <path d="M18 12a2 2 0 0 0 0 4h4v-4h-4z"/>
+          </svg>
+        </div>
+        <h1 class="setup-title">Welcome to KidsWallet!</h1>
+        <p class="setup-subtitle">Let's set up this iPad for your child</p>
+      </div>
+      
+      <div class="setup-content">
+        <div class="setup-form">
+          <!-- Migration notice (shown if old data exists) -->
+          <div class="migration-notice" id="migrationNotice" style="display: none;">
+            <span class="migration-notice-icon">📦</span>
+            <p class="migration-notice-text">
+              Found <strong>existing wallet data</strong>! It will be migrated to the wallet you select or create.
+            </p>
+          </div>
+          
+          <!-- Existing wallets (if any) -->
+          <div class="existing-wallets" id="existingWallets" style="display: none;">
+            <p class="existing-wallets-title">Select a wallet for this iPad</p>
+            <div id="walletsList"></div>
+            <div class="divider">or create new</div>
+          </div>
+          
+          <!-- Child name input -->
+          <div class="form-group">
+            <input 
+              type="text" 
+              class="child-name-input" 
+              id="childNameInput" 
+              placeholder="Child's name"
+              autocomplete="off"
+              autocapitalize="words"
+            >
+          </div>
+        </div>
+      </div>
+      
+      <div class="setup-actions">
+        <button class="btn btn-primary setup-btn" onclick="createAndSelectWallet()">
+          Continue
+        </button>
+      </div>
+    </div>
+    
+    <!-- Step 2: Parent PIN (Optional) -->
+    <div class="setup-step" id="step2">
+      <div class="setup-header">
+        <div class="setup-icon purple">🔐</div>
+        <h1 class="setup-title">Set a Parent PIN</h1>
+        <p class="setup-subtitle" id="pinSubtitle">This PIN protects parent settings. Choose 4 digits.</p>
+      </div>
+      
+      <div class="setup-content">
+        <div class="pin-setup">
+          <div class="pin-dots">
+            <div class="pin-dot" id="pin1"></div>
+            <div class="pin-dot" id="pin2"></div>
+            <div class="pin-dot" id="pin3"></div>
+            <div class="pin-dot" id="pin4"></div>
+          </div>
+          
+          <div class="pin-keypad">
+            <button class="pin-key" onclick="enterPin('1')">1</button>
+            <button class="pin-key" onclick="enterPin('2')">2</button>
+            <button class="pin-key" onclick="enterPin('3')">3</button>
+            <button class="pin-key" onclick="enterPin('4')">4</button>
+            <button class="pin-key" onclick="enterPin('5')">5</button>
+            <button class="pin-key" onclick="enterPin('6')">6</button>
+            <button class="pin-key" onclick="enterPin('7')">7</button>
+            <button class="pin-key" onclick="enterPin('8')">8</button>
+            <button class="pin-key" onclick="enterPin('9')">9</button>
+            <button class="pin-key action" onclick="clearPin()">Clear</button>
+            <button class="pin-key" onclick="enterPin('0')">0</button>
+            <button class="pin-key action" onclick="deletePin()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/>
+                <line x1="18" y1="9" x2="12" y2="15"/>
+                <line x1="12" y1="9" x2="18" y2="15"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="setup-actions">
+        <button class="btn btn-secondary setup-btn setup-btn-secondary" onclick="skipPin()">
+          Skip for now
+        </button>
+      </div>
+    </div>
+    
+    <!-- Step 3: All Done -->
+    <div class="setup-step" id="step3">
+      <div class="setup-header">
+        <div class="success-checkmark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <h1 class="setup-title">All Set!</h1>
+        <p class="setup-subtitle" id="successMessage">Emma's wallet is ready to go!</p>
+      </div>
+      
+      <div class="setup-content">
+        <div class="setup-form" style="text-align: center;">
+          <div class="setup-icon gold" style="margin: 0 auto;">💰</div>
+          <p style="margin-top: var(--space-lg); color: var(--text-secondary);">
+            You can now install this as an app!<br>
+            <strong>Tap Share → Add to Home Screen</strong>
+          </p>
+        </div>
+      </div>
+      
+      <div class="setup-actions">
+        <button class="btn btn-primary setup-btn" onclick="finishSetup()">
+          Start Using KidsWallet
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import {
+      onAuthChange,
+      getCurrentUser,
+      listWallets,
+      createWallet,
+      setSelectedWalletId,
+      getSelectedWalletId,
+      updateWalletData,
+      getWalletData,
+      triggerMigration,
+      hasOldDataToMigrate,
+      formatCurrency,
+      showToast
+    } from './shared.js';
+    
+    // State
+    let currentStep = 1;
+    let selectedWalletId = null;
+    let childName = '';
+    let parentPin = '';
+    let pinMode = 'enter'; // 'enter' or 'confirm'
+    let pinFirstEntry = '';
+    let existingWallets = [];
+    let hasMigrationData = false;
+    
+    // DOM
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    // Check if already setup
+    if (getSelectedWalletId()) {
+      window.location.href = 'index.html';
+    }
+    
+    // Auth check
+    onAuthChange(async (user) => {
+      if (user) {
+        loadingOverlay.classList.add('hidden');
+        await loadExistingWallets();
+        await checkMigrationData();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+    
+    // Check for migration data
+    async function checkMigrationData() {
+      hasMigrationData = await hasOldDataToMigrate();
+      if (hasMigrationData) {
+        document.getElementById('migrationNotice').style.display = 'flex';
+      }
+    }
+    
+    // Load existing wallets
+    async function loadExistingWallets() {
+      existingWallets = await listWallets();
+      
+      if (existingWallets.length > 0) {
+        document.getElementById('existingWallets').style.display = 'block';
+        
+        const walletsList = document.getElementById('walletsList');
+        walletsList.innerHTML = existingWallets.map(w => `
+          <div class="wallet-option" onclick="selectExistingWallet('${w.id}', '${w.childName || w.name}')">
+            <div class="wallet-option-icon">👦</div>
+            <div class="wallet-option-info">
+              <p class="wallet-option-name">${w.childName || w.name}</p>
+              <p class="wallet-option-balance">${formatCurrency(w.balance || 0)}</p>
+            </div>
+            <div class="wallet-option-arrow">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+    
+    // Select existing wallet
+    window.selectExistingWallet = function(walletId, name) {
+      selectedWalletId = walletId;
+      childName = name;
+      setSelectedWalletId(walletId);
+      
+      // Skip to success step (no PIN setup for existing wallet)
+      document.getElementById('successMessage').textContent = `${name}'s wallet is ready on this iPad!`;
+      goToStep(3);
+    };
+    
+    // Create new wallet
+    window.createAndSelectWallet = async function() {
+      const nameInput = document.getElementById('childNameInput');
+      childName = nameInput.value.trim();
+      
+      if (!childName) {
+        showToast('Please enter your child\'s name', 'error');
+        nameInput.focus();
+        return;
+      }
+      
+      // Create wallet
+      loadingOverlay.classList.remove('hidden');
+      selectedWalletId = await createWallet(childName);
+      
+      if (!selectedWalletId) {
+        loadingOverlay.classList.add('hidden');
+        showToast('Failed to create wallet', 'error');
+        return;
+      }
+      
+      // Set as selected for this device
+      setSelectedWalletId(selectedWalletId);
+      
+      // Trigger migration if there's old data
+      if (hasMigrationData) {
+        await triggerMigration();
+      }
+      
+      loadingOverlay.classList.add('hidden');
+      
+      // Go to PIN setup
+      goToStep(2);
+    };
+    
+    // Step navigation
+    function goToStep(step) {
+      document.querySelectorAll('.setup-step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step${step}`).classList.add('active');
+      currentStep = step;
+      
+      if (step === 3) {
+        document.getElementById('successMessage').textContent = `${childName}'s wallet is ready to go!`;
+      }
+    }
+    
+    // PIN entry
+    window.enterPin = function(num) {
+      if (parentPin.length >= 4) return;
+      parentPin += num;
+      updatePinDots();
+      
+      if (parentPin.length === 4) {
+        setTimeout(processPin, 200);
+      }
+    };
+    
+    window.deletePin = function() {
+      parentPin = parentPin.slice(0, -1);
+      updatePinDots();
+    };
+    
+    window.clearPin = function() {
+      parentPin = '';
+      updatePinDots();
+    };
+    
+    function updatePinDots() {
+      for (let i = 1; i <= 4; i++) {
+        const dot = document.getElementById(`pin${i}`);
+        dot.classList.toggle('filled', i <= parentPin.length);
+      }
+    }
+    
+    async function processPin() {
+      if (pinMode === 'enter') {
+        pinFirstEntry = parentPin;
+        pinMode = 'confirm';
+        parentPin = '';
+        updatePinDots();
+        document.getElementById('pinSubtitle').textContent = 'Confirm your PIN';
+      } else {
+        if (parentPin === pinFirstEntry) {
+          // Save PIN
+          loadingOverlay.classList.remove('hidden');
+          await updateWalletData({
+            settings: {
+              ...(await getWalletData()).settings,
+              parentPin: parentPin
+            }
+          });
+          loadingOverlay.classList.add('hidden');
+          
+          showToast('Parent PIN set!', 'success');
+          goToStep(3);
+        } else {
+          showToast('PINs don\'t match, try again', 'error');
+          pinMode = 'enter';
+          pinFirstEntry = '';
+          parentPin = '';
+          updatePinDots();
+          document.getElementById('pinSubtitle').textContent = 'This PIN protects parent settings. Choose 4 digits.';
+        }
+      }
+    }
+    
+    window.skipPin = function() {
+      goToStep(3);
+    };
+    
+    window.finishSetup = function() {
+      window.location.href = 'index.html';
+    };
+  </script>
+</body>
+</html>
