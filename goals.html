@@ -311,32 +311,83 @@
     }
     
     /* Emoji Picker */
+    .emoji-section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: var(--space-sm) 0 var(--space-xs);
+    }
+
     .emoji-picker {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--space-sm);
-      margin-bottom: var(--space-md);
+      gap: var(--space-xs);
+      margin-bottom: var(--space-xs);
     }
     
     .emoji-btn {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: var(--radius-md);
       background: var(--bg-elevated);
       border: 2px solid transparent;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       cursor: pointer;
       transition: all var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .emoji-btn:hover {
       background: var(--bg-card);
-      transform: scale(1.1);
+      transform: scale(1.15);
     }
     
     .emoji-btn.selected {
       border-color: var(--accent-primary);
-      background: rgba(0, 184, 169, 0.1);
+      background: rgba(0, 184, 169, 0.12);
+      transform: scale(1.1);
+    }
+
+    /* Custom emoji input */
+    .custom-emoji-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      transition: border-color var(--transition-fast);
+    }
+
+    .custom-emoji-row:focus-within {
+      border-color: var(--accent-primary);
+    }
+
+    .custom-emoji-preview {
+      font-size: 1.6rem;
+      width: 40px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .custom-emoji-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-family: var(--font-body);
+    }
+
+    .custom-emoji-input::placeholder {
+      color: var(--text-muted);
     }
     
     /* Loading Overlay */
@@ -409,19 +460,94 @@
       
       <div class="form-group">
         <label class="form-label">Pick an emoji</label>
+        
+        <div class="emoji-section-label">🎮 Games & Toys</div>
         <div class="emoji-picker" id="emojiPicker">
           <button class="emoji-btn selected" data-emoji="🎮">🎮</button>
-          <button class="emoji-btn" data-emoji="🚲">🚲</button>
-          <button class="emoji-btn" data-emoji="📱">📱</button>
-          <button class="emoji-btn" data-emoji="🎧">🎧</button>
+          <button class="emoji-btn" data-emoji="🕹️">🕹️</button>
+          <button class="emoji-btn" data-emoji="🎲">🎲</button>
+          <button class="emoji-btn" data-emoji="🃏">🃏</button>
+          <button class="emoji-btn" data-emoji="🧸">🧸</button>
+          <button class="emoji-btn" data-emoji="🪆">🪆</button>
+          <button class="emoji-btn" data-emoji="🤖">🤖</button>
+          <button class="emoji-btn" data-emoji="🎪">🎪</button>
+        </div>
+
+        <div class="emoji-section-label">⚽ Sports & Outdoor</div>
+        <div class="emoji-picker">
           <button class="emoji-btn" data-emoji="⚽">⚽</button>
+          <button class="emoji-btn" data-emoji="🏀">🏀</button>
+          <button class="emoji-btn" data-emoji="🎾">🎾</button>
+          <button class="emoji-btn" data-emoji="🏈">🏈</button>
+          <button class="emoji-btn" data-emoji="⚾">⚾</button>
+          <button class="emoji-btn" data-emoji="🏊">🏊</button>
+          <button class="emoji-btn" data-emoji="🚲">🚲</button>
+          <button class="emoji-btn" data-emoji="🛹">🛹</button>
+          <button class="emoji-btn" data-emoji="🛼">🛼</button>
+          <button class="emoji-btn" data-emoji="⛷️">⛷️</button>
+          <button class="emoji-btn" data-emoji="🏒">🏒</button>
+        </div>
+
+        <div class="emoji-section-label">📱 Tech & Gadgets</div>
+        <div class="emoji-picker">
+          <button class="emoji-btn" data-emoji="📱">📱</button>
+          <button class="emoji-btn" data-emoji="💻">💻</button>
+          <button class="emoji-btn" data-emoji="🎧">🎧</button>
+          <button class="emoji-btn" data-emoji="📷">📷</button>
+          <button class="emoji-btn" data-emoji="🎵">🎵</button>
+          <button class="emoji-btn" data-emoji="📺">📺</button>
+          <button class="emoji-btn" data-emoji="🖨️">🖨️</button>
+          <button class="emoji-btn" data-emoji="⌚">⌚</button>
+        </div>
+
+        <div class="emoji-section-label">🎨 Creative & Hobbies</div>
+        <div class="emoji-picker">
           <button class="emoji-btn" data-emoji="🎨">🎨</button>
-          <button class="emoji-btn" data-emoji="📚">📚</button>
           <button class="emoji-btn" data-emoji="🎸">🎸</button>
-          <button class="emoji-btn" data-emoji="🎁">🎁</button>
-          <button class="emoji-btn" data-emoji="✈️">✈️</button>
+          <button class="emoji-btn" data-emoji="🎹">🎹</button>
+          <button class="emoji-btn" data-emoji="🎺">🎺</button>
+          <button class="emoji-btn" data-emoji="🎻">🎻</button>
+          <button class="emoji-btn" data-emoji="📚">📚</button>
+          <button class="emoji-btn" data-emoji="✏️">✏️</button>
+          <button class="emoji-btn" data-emoji="🧩">🧩</button>
+          <button class="emoji-btn" data-emoji="👕">👕</button>
+        </div>
+
+        <div class="emoji-section-label">🐶 Animals & Nature</div>
+        <div class="emoji-picker">
           <button class="emoji-btn" data-emoji="🐶">🐶</button>
-          <button class="emoji-btn" data-emoji="🌟">🌟</button>
+          <button class="emoji-btn" data-emoji="🐱">🐱</button>
+          <button class="emoji-btn" data-emoji="🐠">🐠</button>
+          <button class="emoji-btn" data-emoji="🐰">🐰</button>
+          <button class="emoji-btn" data-emoji="🦜">🦜</button>
+          <button class="emoji-btn" data-emoji="🌺">🌺</button>
+          <button class="emoji-btn" data-emoji="🌈">🌈</button>
+          <button class="emoji-btn" data-emoji="⭐">⭐</button>
+        </div>
+
+        <div class="emoji-section-label">✈️ Adventures & Treats</div>
+        <div class="emoji-picker">
+          <button class="emoji-btn" data-emoji="✈️">✈️</button>
+          <button class="emoji-btn" data-emoji="🏖️">🏖️</button>
+          <button class="emoji-btn" data-emoji="🎢">🎢</button>
+          <button class="emoji-btn" data-emoji="🍕">🍕</button>
+          <button class="emoji-btn" data-emoji="🍦">🍦</button>
+          <button class="emoji-btn" data-emoji="🎂">🎂</button>
+          <button class="emoji-btn" data-emoji="🎁">🎁</button>
+          <button class="emoji-btn" data-emoji="🏆">🏆</button>
+        </div>
+
+        <!-- Custom emoji input -->
+        <div class="emoji-section-label">✨ Or type your own</div>
+        <div class="custom-emoji-row">
+          <div class="custom-emoji-preview" id="customEmojiPreview">🎯</div>
+          <input 
+            type="text" 
+            class="custom-emoji-input" 
+            id="customEmojiInput"
+            placeholder="Paste or type any emoji here..."
+            maxlength="8"
+          >
         </div>
       </div>
       
@@ -590,6 +716,7 @@
       document.getElementById('goalNameInput').value = '';
       document.getElementById('goalCostInput').value = '';
       selectedEmoji = '🎮';
+      document.getElementById('customEmojiInput').value = '';
       updateEmojiSelection();
       document.getElementById('goalModal').classList.add('active');
       
@@ -606,14 +733,40 @@
       document.querySelectorAll('.emoji-btn').forEach(btn => {
         btn.classList.toggle('selected', btn.dataset.emoji === selectedEmoji);
       });
+      // Sync custom preview
+      document.getElementById('customEmojiPreview').textContent = selectedEmoji;
+      // Clear custom input if a preset was chosen
+      const customInput = document.getElementById('customEmojiInput');
+      if (customInput.value && getFirstEmoji(customInput.value) !== selectedEmoji) {
+        customInput.value = '';
+      }
+    }
+
+    // Extract first emoji from a string
+    function getFirstEmoji(str) {
+      const emojiRegex = /\p{Emoji_Presentation}|\p{Emoji}\uFE0F/u;
+      const match = str.match(emojiRegex);
+      return match ? match[0] : null;
     }
     
-    // Emoji Picker
-    document.getElementById('emojiPicker').addEventListener('click', (e) => {
+    // Emoji Picker — delegate on document to catch all .emoji-btn clicks (multiple pickers)
+    document.addEventListener('click', (e) => {
       const btn = e.target.closest('.emoji-btn');
-      if (btn) {
+      if (btn && btn.dataset.emoji) {
         selectedEmoji = btn.dataset.emoji;
         updateEmojiSelection();
+      }
+    });
+
+    // Custom emoji input
+    document.getElementById('customEmojiInput').addEventListener('input', (e) => {
+      const val = e.target.value;
+      const emoji = getFirstEmoji(val);
+      if (emoji) {
+        selectedEmoji = emoji;
+        document.getElementById('customEmojiPreview').textContent = emoji;
+        // Deselect all preset buttons
+        document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('selected'));
       }
     });
     
