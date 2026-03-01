@@ -813,16 +813,19 @@ export function shouldApplyInterest(settings) {
   const today = now.getDate();
   const interestDay = settings.interestDay || 1;
   
-  if (today !== interestDay) return false;
+  // Interest day hasn't arrived yet this month — too early
+  if (today < interestDay) return false;
   
+  // Check if interest was already applied this month
   if (settings.lastInterestDate) {
     const lastDate = new Date(settings.lastInterestDate);
     if (lastDate.getMonth() === now.getMonth() && 
         lastDate.getFullYear() === now.getFullYear()) {
-      return false;
+      return false; // Already applied this month
     }
   }
   
+  // Interest day has passed (or is today) and not yet applied — apply it
   return true;
 }
 
