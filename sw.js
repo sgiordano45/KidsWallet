@@ -1,14 +1,18 @@
 // KidsWallet Service Worker
-const CACHE_NAME = 'kidswallet-v7';
+const CACHE_NAME = 'kidswallet-v8';
 const BASE_PATH = '/KidsWallet';
 
 const STATIC_ASSETS = [
   `${BASE_PATH}/shared.css`,
-  `${BASE_PATH}/shared.js`,
   `${BASE_PATH}/firebase-config.js`,
   `${BASE_PATH}/manifest.json`,
   `${BASE_PATH}/icons/icon-192.png`,
   `${BASE_PATH}/icons/icon-512.png`
+];
+
+// JS files with logic that must always be current
+const LOGIC_FILES = [
+  `${BASE_PATH}/shared.js`
 ];
 
 const HTML_PAGES = [
@@ -64,9 +68,10 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const isHTML = HTML_PAGES.some(p => url.pathname === p || url.pathname.endsWith('.html'))
                  || event.request.mode === 'navigate';
+  const isLogicFile = LOGIC_FILES.some(p => url.pathname === p);
 
-  if (isHTML) {
-    // NETWORK-FIRST for HTML pages: always try to get the latest version
+  if (isHTML || isLogicFile) {
+    // NETWORK-FIRST for HTML pages and logic JS files: always try to get the latest version
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -78,7 +83,7 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => {
           // Offline fallback: serve from cache
-          console.log('[SW] Offline - serving cached HTML for:', event.request.url);
+          console.log('[SW] Offline - serving cached file for:', event.request.url);
           return caches.match(event.request)
             || caches.match(`${BASE_PATH}/index.html`);
         })
