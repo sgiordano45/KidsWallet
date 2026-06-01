@@ -563,6 +563,7 @@
     let enteredKidPin = '';
     let kidPinMode = 'verify'; // 'verify', 'setup', 'confirm'
     let kidPinSetupValue = '';
+    let interestAppliedThisSession = false; // Guard against double-apply from Firestore onSnapshot re-fires
     
     // DOM Elements
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -796,8 +797,11 @@
     
     // Interest Check
     async function checkAndApplyInterest() {
+      if (interestAppliedThisSession) return; // Guard against double-apply from onSnapshot re-fires
       if (!walletData || !shouldApplyInterest(walletData.settings)) return;
-      
+
+      interestAppliedThisSession = true; // Set immediately before any async work
+
       const interest = calculateInterest(walletData.balance, walletData.settings.interestRate);
       if (interest <= 0) return;
       
